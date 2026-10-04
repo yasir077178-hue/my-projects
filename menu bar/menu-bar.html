@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Programs</title>
+    <link rel="stylesheet" href="menu bar style.css">
+</head>
+
+<body>
+
+    <div id="menu">
+
+        <div id="logo">MY PROGRAMS</div>
+
+        <button onclick="showHome()">Home</button>
+        <button onclick="showCalculator()">Calculator</button>
+        <button onclick="showPinball()">Pinball</button>
+
+    </div>
+
+    <div id="content">
+        <h1>Welcome to My Programs</h1>
+    </div>
+
+    <script>
+
+        function showHome() {
+            document.getElementById("content").innerHTML =
+            "<h1>Welcome to My Programs</h1>";
+        }
+
+        function showCalculator() {
+            document.getElementById("content").innerHTML =
+            '<iframe src="../calculator/calculator.html"></iframe>';
+        }
+
+        function showPinball() {
+            document.getElementById("content").innerHTML =
+            '<iframe src="../pinball/pinball.html"></iframe>';
+        }
+
+    </script>
+
+</body>
+</html>

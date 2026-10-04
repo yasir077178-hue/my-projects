@@ -1,0 +1,260 @@
+body {
+    margin: 0px;
+    background: #080c06;
+    color: white;
+    font-family: Arial;
+    text-align: center;
+}
+
+h1 {
+    margin: 18px;
+    color: #d6a936;
+    font-size: 36px;
+    text-shadow: 0px 0px 15px #d6a936;
+}
+
+#info {
+    width: 800px;
+    margin: auto;
+    display: flex;
+    justify-content: space-between;
+    font-size: 21px;
+    font-weight: bold;
+}
+
+#info span {
+    color: #d6a936;
+}
+
+#gameboard {
+    width: 800px;
+    height: 800px;
+    margin: 12px auto;
+    position: relative;
+    overflow: hidden;
+    background: radial-gradient(circle, #263523, #0b1009);
+    border: 8px solid #d6a936;
+    border-radius: 24px;
+    box-shadow: 0px 0px 25px #d6a936;
+}
+
+#ball {
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    border-radius: 50%;
+    background: white;
+    box-shadow: 0px 0px 10px white;
+    z-index: 30;
+}
+
+.bumper {
+    width: 54px;
+    height: 54px;
+    position: absolute;
+    border-radius: 50%;
+    background: radial-gradient(circle, #fff4a8, #d6a936, #765b18);
+    border: 5px solid white;
+    box-shadow: 0px 0px 15px #d6a936;
+    z-index: 10;
+}
+
+.bumper1 {
+    left: 85px;
+    top: 145px;
+}
+
+.bumper2 {
+    left: 365px;
+    top: 105px;
+}
+
+.bumper3 {
+    left: 635px;
+    top: 155px;
+}
+
+.bumper4 {
+    left: 215px;
+    top: 300px;
+}
+
+.bumper5 {
+    left: 500px;
+    top: 285px;
+}
+
+.bumper6 {
+    left: 80px;
+    top: 505px;
+}
+
+.bumper7 {
+    left: 625px;
+    top: 500px;
+}
+
+.wall {
+    position: absolute;
+    background: #46503d;
+    border: 4px solid #899476;
+    z-index: 5;
+}
+
+.wall1 {
+    width: 18px;
+    height: 320px;
+    left: 48px;
+    top: 80px;
+}
+
+.wall2 {
+    width: 18px;
+    height: 320px;
+    left: 734px;
+    top: 80px;
+}
+
+.wall3 {
+    width: 190px;
+    height: 18px;
+    left: 80px;
+    top: 450px;
+}
+
+.wall4 {
+    width: 190px;
+    height: 18px;
+    left: 530px;
+    top: 450px;
+}
+
+.pipe {
+    position: absolute;
+    border: 12px solid #70482b;
+    border-radius: 50px;
+    z-index: 4;
+}
+
+.pipe1 {
+    width: 125px;
+    height: 170px;
+    left: 115px;
+    top: 75px;
+}
+
+.pipe2 {
+    width: 125px;
+    height: 170px;
+    left: 555px;
+    top: 75px;
+}
+
+#leftflipper {
+    position: absolute;
+    width: 220px;
+    height: 25px;
+    left: 105px;
+    top: 720px;
+    background: linear-gradient(#f2d66b, #a47d18);
+    border: 4px solid white;
+    border-radius: 20px;
+    transform-origin: right center;
+    transform: rotate(8deg);
+    z-index: 20;
+    box-shadow: 0px 0px 15px #d6a936;
+}
+
+#rightflipper {
+    position: absolute;
+    width: 220px;
+    height: 25px;
+    left: 475px;
+    top: 720px;
+    background: linear-gradient(#f2d66b, #a47d18);
+    border: 4px solid white;
+    border-radius: 20px;
+    transform-origin: left center;
+    transform: rotate(-8deg);
+    z-index: 20;
+    box-shadow: 0px 0px 15px #d6a936;
+}
+
+#launcher {
+    position: absolute;
+    width: 48px;
+    height: 600px;
+    left: 730px;
+    top: 175px;
+    background: #171b16;
+    border: 5px solid #777;
+    border-radius: 25px;
+    z-index: 15;
+}
+
+#launcherSpring {
+    position: absolute;
+    width: 24px;
+    height: 470px;
+    left: 7px;
+    bottom: 65px;
+    border: 5px solid #d6a936;
+    border-radius: 20px;
+}
+
+#launcherPlunger {
+    position: absolute;
+    width: 34px;
+    height: 35px;
+    left: 2px;
+    bottom: 10px;
+    background: #aaa;
+    border: 4px solid white;
+    border-radius: 8px;
+}
+
+button {
+    padding: 12px 25px;
+    margin: 8px;
+    border: 2px solid #d6a936;
+    border-radius: 8px;
+    background: #d6a936;
+    color: #10150d;
+    font-size: 17px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#controls {
+    width: 800px;
+    margin: 8px auto;
+    display: flex;
+    justify-content: space-between;
+    color: #aab49d;
+    font-size: 14px;
+}
+
+#historyPanel {
+    display: none;
+    position: fixed;
+    width: 480px;
+    height: 520px;
+    left: 50%;
+    top: 90px;
+    transform: translateX(-50%);
+    padding: 20px;
+    background: #10150d;
+    border: 5px solid #d6a936;
+    border-radius: 20px;
+    z-index: 100;
+}
+
+#historyPanel h2 {
+    color: #d6a936;
+}
+
+.historyGame {
+    padding: 15px;
+    border-bottom: 2px solid #5d5129;
+    font-size: 18px;
+}

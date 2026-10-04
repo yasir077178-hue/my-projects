@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Jurassic Pinball</title>
+    <style> 
+        body {
+            margin: 0px;
+            background: #0b1008;
+            color: white;
+            font-family: Arial;
+            text-align: center;
+        }
+
+        h1 {
+            margin-top: 220px;
+            font-size: 58px;
+            color: #d6a936;
+            text-shadow: 0px 0px 20px #d6a936;
+        }
+
+        p {
+            font-size: 22px;
+            color: #aab49d;
+        }
+
+        button {
+            margin-top: 30px;
+            padding: 18px 50px;
+            border: 3px solid #d6a936;
+            border-radius: 12px;
+            background: #d6a936;
+            color: #10150d;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            transform: scale(1.06);
+        }
+    </style> 
+</head>
+
+<body>
+
+    <h1>🦖 JURASSIC PINBALL 🦖</h1>
+
+    <p>Enter the prehistoric pinball arena</p>
+
+    <button onclick="startGame()">START GAME</button>
+
+    <script>
+        function startGame() {
+            window.location.href = "pinball.html";
+        }
+    </script>
+
+</body>
+</html>

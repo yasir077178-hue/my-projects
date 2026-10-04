@@ -1,0 +1,77 @@
+ <html>
+     <body>
+         <style>
+            body{ font-family: Arial, sans-serif; display:flex; flex-direction:column; align-items:center; gap:12px; padding:20px }
+            .display{
+                width: 420px;
+                height: 60px;
+                border: 2px solid #333;
+                border-radius: 6px;
+                background: #000;
+                color: #0f0;
+                font-size: 24px;
+                padding: 10px;
+                box-sizing: border-box;
+                text-align: right;
+                overflow: hidden;
+            }
+            .buttons{ display:grid; grid-template-columns:repeat(4,100px); gap:10px; justify-content:center }
+            button{ background-color: black; color: white; width: 100px; height: 50px; padding: 0; font-size: 18px; border-radius:6px; cursor:pointer }
+        </style>
+          <h3>history</h3>
+    <div id = "History"></div>
+    <h1>Calculator</h1>
+
+    <div id="Display" class="display">0</div>
+
+  
+
+    <div class="buttons">
+    <button style="color: rgb(34, 0, 255);" onclick="addToDisplay('1')">1</button>
+    <button style="color: rgb(239, 4, 4);" onclick="addToDisplay('2')">2</button>
+    <button style="color: rgb(9, 238, 20);" onclick="addToDisplay('3')">3</button>
+    <button style="color: rgb(255, 255, 255);" onclick="addToDisplay('+')">+</button>
+    <button style="color: rgb(252, 207, 4);" onclick="addToDisplay('4')">4</button>
+    <button style="color: rgb(248, 5, 122);" onclick="addToDisplay('5')">5</button>
+    <button style="color: rgb(204, 79, 79);" onclick="addToDisplay('6')">6</button>
+    <button style="color: rgb(255, 255, 255);" onclick="addToDisplay('-')">-</button>
+    <button style="color: rgb(255, 98, 0);" onclick="addToDisplay('7')">7</button>
+    <button style="color: rgb(7, 136, 249);" onclick="addToDisplay('8')">8</button>
+    <button style="color: rgb(1, 237, 245);" onclick="addToDisplay('9')">9</button>
+    <button style="color: rgb(255, 255, 255);" onclick="addToDisplay('*')">x</button>
+    <button style="color: rgb(176, 234, 1);" onclick="addToDisplay('/')">/</button>
+    <button style="color: rgb(255, 255, 255);" onclick="addToDisplay('0')">0</button>
+    <button style="color: rgb(255, 255, 255);" onclick="calculate()">=</button>
+    <button style="color: rgb(255, 255, 255);" onclick="clearDisplay('')">Clear</button>
+    <button onclick="clearHistory()">
+        clear history
+    </button>
+    </div>
+    
+    <script>
+        let expression = '';
+        let history = [];
+
+        function addToDisplay(value) {
+            expression = expression + value;
+            document.getElementById('Display').innerText = expression;
+        }
+
+        function calculate() {
+           let answer = eval(expression);
+           document.getElementById('Display').innerText = answer;
+           history.push(expression + ' = ' + answer);
+           document.getElementById('History').innerHTML = history.join('<br>');
+           expression = answer.toString();
+        }
+        function clearDisplay() {
+            expression = '';
+            document.getElementById('Display').innerHTML = '0';
+        }
+        function clearHistory() {
+            history = [];
+            document.getElementById('History').innerHTML = '';
+        }
+    </script>
+    </body>
+</html>

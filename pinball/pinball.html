@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Jurassic Pinball</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<h1>🦖 JURASSIC PINBALL 🦖</h1>
+
+<div id="info">
+    <div>SCORE <span id="score">0</span></div>
+    <div>LIVES <span id="lives">3</span></div>
+    <div>TIME <span id="time">0 sec</span></div>
+</div>
+
+<div id="gameboard">
+
+    <div class="wall wall1"></div>
+    <div class="wall wall2"></div>
+    <div class="wall wall3"></div>
+    <div class="wall wall4"></div>
+
+    <div class="pipe pipe1"></div>
+    <div class="pipe pipe2"></div>
+
+    <div class="bumper bumper1"></div>
+    <div class="bumper bumper2"></div>
+    <div class="bumper bumper3"></div>
+    <div class="bumper bumper4"></div>
+    <div class="bumper bumper5"></div>
+    <div class="bumper bumper6"></div>
+    <div class="bumper bumper7"></div>
+
+    <div id="leftflipper"></div>
+    <div id="rightflipper"></div>
+
+    <div id="launcher">
+        <div id="launcherSpring"></div>
+        <div id="launcherPlunger"></div>
+    </div>
+
+    <div id="ball"></div>
+
+</div>
+
+<div id="controls">
+    <span>← LEFT FLIPPER</span>
+    <span>↓ LAUNCH</span>
+    <span>RIGHT FLIPPER →</span>
+</div>
+
+<button id="restartButton">RESTART</button>
+<button id="historyButton">HISTORY</button>
+
+<div id="historyPanel">
+    <h2>GAME HISTORY</h2>
+    <div id="historylist"></div>
+    <button id="closeHistory">BACK</button>
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
