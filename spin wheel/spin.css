@@ -1,0 +1,132 @@
+body {
+    margin: 0px;
+    background: #101018;
+    color: white;
+    font-family: Arial;
+    text-align: center;
+}
+
+h1 {
+    margin-top: 40px;
+    font-size: 42px;
+}
+
+#wheelArea {
+    width: 520px;
+    height: 520px;
+    margin: 40px auto;
+    position: relative;
+}
+
+#wheel {
+    width: 500px;
+    height: 500px;
+    position: absolute;
+    left: 10px;
+    top: 10px;
+    border-radius: 50%;
+    border: 8px solid white;
+    overflow: hidden;
+    transition: transform 5s cubic-bezier(0.15, 0.8, 0.2, 1);
+}
+
+.section {
+    position: absolute;
+    width: 250px;
+    height: 250px;
+    left: 250px;
+    top: 250px;
+    transform-origin: 0px 0px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.section1 {
+    background: red;
+    transform: rotate(0deg) skewY(-45deg);
+}
+
+.section2 {
+    background: skyblue;
+    transform: rotate(45deg) skewY(-45deg);
+}
+
+.section3 {
+    background: greenyellow;
+    transform: rotate(90deg) skewY(-45deg);
+}
+
+.section4 {
+    background: yellow;
+    transform: rotate(135deg) skewY(-45deg);
+}
+
+.section5 {
+    background: violet;
+    transform: rotate(180deg) skewY(-45deg);
+}
+
+.section6 {
+    background: orange;
+    transform: rotate(225deg) skewY(-45deg);
+}
+
+.section7 {
+    background: rgb(14, 226, 226);
+    transform: rotate(270deg) skewY(-45deg);
+}
+
+.section8 {
+    background: darkblue;
+    transform: rotate(315deg) skewY(-45deg);
+}
+
+#center {
+    position: absolute;
+    width: 90px;
+    height: 90px;
+    left: 205px;
+    top: 205px;
+    border-radius: 50%;
+    background: white;
+    color: #101018;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    z-index: 10;
+}
+
+#pointer {
+    position: absolute;
+    z-index: 20;
+    top: -5px;
+    left: 230px;
+    width: 0px;
+    height: 0px;
+    border-left: 30px solid transparent;
+    border-right: 30px solid transparent;
+    border-top: 60px solid white;
+}
+
+#spinButton {
+    padding: 15px 35px;
+    font-size: 20px;
+    font-weight: bold;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+#spinButton:hover {
+    transform: scale(1.05);
+}
+
+#result {
+    margin: 25px auto;
+    font-size: 24px;
+    font-weight: bold;
+}
