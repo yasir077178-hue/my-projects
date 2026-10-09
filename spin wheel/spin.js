@@ -15,4 +15,4 @@ const resultText = document.getElementById("result");
     "PRIZE 8"
  ];
 
- spinButton.onclick
+ 
