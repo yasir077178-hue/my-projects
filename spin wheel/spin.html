@@ -1,32 +1,97 @@
+
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>
-            spin wheel
-        </title>
-        <link rel="stylesheet" href="spin.css">
+<head>
+    <title>Premium Spin Wheel</title>
+    <link rel="stylesheet" href="spin.css">
+</head>
+<body>
 
+    <header>
+        <div class="logo">SPIN<span>MASTER</span></div>
+        <p class="subtitle">YOUR LUCK. YOUR CHOICE.</p>
+    </header>
 
-    </head>
-    <body>
-        <h1>spin wheel</h1>
-        <div id="wheel area">
-            <div id="pointer"></div>
-        <div id="wheel">
-            <div class="section section1">PRIZE1</div>
-            <div class="section section2">PRIZE2</div>
-            <div class="section section3">PRIZE3</div>
-            <div class="section section4">PRIZE4</div>
-            <div class="section section5">PRIZE5</div>
-            <div class="section section6">PRIZE6</div>
-            <div class="section section7">PRIZE7</div>
-            <div class="section section8">PRIZE8</div>
+    <main>
+        <section class="wheel-section">
+            <div class="wheel-container">
+                <div id="pointer"></div>
+
+                <div id="wheel">
+                    <div id="prizeLabels"></div>
+                    <div id="center">SPIN</div>
+                </div>
+            </div>
+
+            <button id="spinButton">SPIN THE WHEEL</button>
+            <div id="result">READY TO SPIN?</div>
+        </section>
+
+        <section class="settings">
+            <h2>Customize Your Wheel</h2>
+            <p class="description">Enter one prize per line. Add as many as you need.</p>
+
+            <textarea id="prizesInput" rows="10">
+                Prize 1
+                Prize 2
+                Prize 3
+                Prize 4
+                Prize 5
+                Prize 6
+                Prize 7
+                Prize 8
+            </textarea>
+            
+            <div class="control-group">
+    <label for="spinSpeed">Spin Speed</label>
+    <input type="range" id="spinSpeed" min="2" max="10" value="5" step="1">
+    <p id="speedValue">5 seconds</p>
+</div>
+
+<div class="control-group">
+    <label for="prizePictures">Upload Prize Pictures</label>
+
+    <input
+        type="file"
+        id="prizePictures"
+        accept="image/*"
+        multiple
+    >
+
+    <p class="note">
+        Add as many pictures as you need.
+        Each picture becomes a separate prize.
+    </p>
+
+    <div id="pictureGallery" class="picture-gallery"></div>
+</div>
+
+            <button id="updateButton">UPDATE WHEEL</button>
+            <p class="note">Enter at least 2 prizes. Each prize gets an equal slice.</p>
+        </section>
+    </main>
+
+    <footer>MAKE EVERY SPIN COUNT</footer>
+
+    <div id = "winnerpopup" class = "popup-overlay">
+        <div class = "popup-box">
+            <h2>🎉 We Have a Winner!</h2>
+       <p id="winnerName"></p>
+
+<img
+    id="winnerPicture"
+    class="winner-picture"
+    alt="Winning picture"
+    style="display: none;"
+>
+
+<p id="winnerQuestion">Do you want to remove this winner?</p>
+        <div class="popup-buttons">
+            <button id="removeWinnerButton">Yes, Remove</button>
+            <button id="keepWinnerButton">No, Keep It</button>
+            </div>
         </div>
-            <div id="center">SPIN</div>
-        </div>
-
-        <button id="spinbutton">SPIN WHEEL</button>
-        <script src="spin.js"></script>
-    
-    </body>
+    </div>
+    <script src="spin.js"></script>
+</body>
 </html>

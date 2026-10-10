@@ -1,132 +1,442 @@
+
+
+* {
+    box-sizing: border-box;
+}
+
 body {
     margin: 0px;
-    background: #101018;
-    color: white;
-    font-family: Arial;
+    min-height: 100vh;
+    background-color: #0b1020;
+    color: #f5f0df;
+    font-family: Arial, sans-serif;
     text-align: center;
+    overscroll-behavior: none;
 }
 
-h1 {
-    margin-top: 40px;
-    font-size: 42px;
+header {
+    padding: 30px 15px 10px;
 }
 
-#wheelArea {
-    width: 520px;
-    height: 520px;
-    margin: 40px auto;
+.logo {
+    color: #e5c477;
+    font-size: 32px;
+    font-weight: bold;
+    letter-spacing: 5px;
+}
+
+.logo span {
+    color: white;
+}
+
+.subtitle {
+    color: #8d8b83;
+    font-size: 11px;
+    letter-spacing: 4px;
+}
+
+main {
+    width: 100%;
+    max-width: 1100px;
+    margin: 25px auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: center;
+    justify-content: center;
+    gap: 60px;
+}
+
+.wheel-section {
+    width: 480px;
+    max-width: 100%;
+}
+
+.wheel-container {
+    width: min(440px, 85vw);
+    aspect-ratio: 1;
+    margin: 20px auto 30px;
+    padding: 12px;
     position: relative;
+    border: 5px solid #d8b56b;
+    border-radius: 50%;
+    background: #17171c;
+    box-shadow:
+        0px 0px 0px 5px #332918,
+        0px 0px 35px #745723;
 }
 
 #wheel {
-    width: 500px;
-    height: 500px;
-    position: absolute;
-    left: 10px;
-    top: 10px;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    border: 3px solid #f0dba4;
     border-radius: 50%;
-    border: 8px solid white;
+    background: #34345f;
     overflow: hidden;
-    transition: transform 5s cubic-bezier(0.15, 0.8, 0.2, 1);
+    transition: transform 5s cubic-bezier(0.12, 0.72, 0.12, 1);
+    box-shadow: inset 0px 0px 25px #000000;
 }
 
-.section {
+#prizeLabels {
     position: absolute;
-    width: 250px;
-    height: 250px;
-    left: 250px;
-    top: 250px;
-    transform-origin: 0px 0px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    inset: 0px;
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+
+    
+
+.prize-label {
+    position: absolute;
+    color: #fff8e5;
+    font-size: 12px;
     font-weight: bold;
-    font-size: 18px;
+    text-align: center;
+    text-shadow: 0px 2px 4px #000000;
+    line-height: 1.2;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    z-index: 2;
+    pointer-events: none;
 }
 
-.section1 {
-    background: red;
-    transform: rotate(0deg) skewY(-45deg);
-}
 
-.section2 {
-    background: skyblue;
-    transform: rotate(45deg) skewY(-45deg);
-}
 
-.section3 {
-    background: greenyellow;
-    transform: rotate(90deg) skewY(-45deg);
-}
-
-.section4 {
-    background: yellow;
-    transform: rotate(135deg) skewY(-45deg);
-}
-
-.section5 {
-    background: violet;
-    transform: rotate(180deg) skewY(-45deg);
-}
-
-.section6 {
-    background: orange;
-    transform: rotate(225deg) skewY(-45deg);
-}
-
-.section7 {
-    background: rgb(14, 226, 226);
-    transform: rotate(270deg) skewY(-45deg);
-}
-
-.section8 {
-    background: darkblue;
-    transform: rotate(315deg) skewY(-45deg);
-}
 
 #center {
     position: absolute;
-    width: 90px;
-    height: 90px;
-    left: 205px;
-    top: 205px;
+    width: 82px;
+    height: 82px;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    border: 5px solid #f4dfa8;
     border-radius: 50%;
-    background: white;
-    color: #101018;
+    background: radial-gradient(circle at 35% 30%, #4c3b20, #17120b);
+    color: #f4dfa8;
     display: flex;
     align-items: center;
     justify-content: center;
+    font-size: 15px;
     font-weight: bold;
-    z-index: 10;
+    letter-spacing: 2px;
+    box-shadow: 0px 0px 20px #000000;
+    z-index: 5;
 }
 
 #pointer {
     position: absolute;
-    z-index: 20;
-    top: -5px;
-    left: 230px;
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%);
     width: 0px;
     height: 0px;
-    border-left: 30px solid transparent;
-    border-right: 30px solid transparent;
-    border-top: 60px solid white;
+    border-left: 20px solid transparent;
+    border-right: 20px solid transparent;
+    border-top: 42px solid #fff0bb;
+    filter: drop-shadow(0px 3px 5px #000000);
+    z-index: 10;
 }
 
-#spinButton {
-    padding: 15px 35px;
-    font-size: 20px;
+button {
+    border: 1px solid #f1d18b;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #e7c67f, #ad813a);
+    color: #17120b;
+    padding: 15px 24px;
+    font-size: 13px;
     font-weight: bold;
-    border: none;
-    border-radius: 10px;
+    letter-spacing: 1px;
     cursor: pointer;
+    transition: transform 0.2s, filter 0.2s;
 }
 
-#spinButton:hover {
-    transform: scale(1.05);
+button:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.12);
+}
+
+button:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
 }
 
 #result {
-    margin: 25px auto;
-    font-size: 24px;
+    min-height: 30px;
+    margin-top: 25px;
+    color: #e9ca84;
+    font-size: 20px;
+    font-weight: bold;
+    overflow-wrap: anywhere;
+}
+
+.settings {
+    width: 300px;
+    max-width: 100%;
+    padding: 25px;
+    border: 1px solid #4c4029;
+    border-radius: 15px;
+    background: linear-gradient(145deg, #19191f, #101015);
+    box-shadow: 0px 10px 35px #000000;
+}
+
+.settings h2 {
+    color: #e5c477;
+    font-size: 23px;
+}
+
+.description,
+.note {
+    color: #99968c;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+#prizesInput {
+    width: 100%;
+    margin: 15px 0px;
+    padding: 14px;
+    resize: vertical;
+    border: 1px solid #51452e;
+    border-radius: 8px;
+    background: #0c0d12;
+    color: #f5f0df;
+    font: 15px Arial, sans-serif;
+    line-height: 1.8;
+    outline: none;
+}
+
+#prizesInput:focus {
+    border-color: #d8b56b;
+}
+
+#updateButton {
+    width: 100%;
+}
+
+footer {
+    padding: 15px;
+    color: #68675f;
+    font-size: 11px;
+    letter-spacing: 4px;
+}
+
+@media (max-width: 850px) {
+    main {
+        flex-direction: row-reverse;
+        gap: 20px;
+        padding: 10px;
+    }
+
+    .wheel-section {
+        width: auto;
+        flex: 1;
+        min-width: 0;
+    }
+
+    .wheel-container {
+        width: min(400px, 100%);
+    }
+
+    .settings {
+        width: 260px;
+        max-width: 40%;
+        padding: 18px;
+    }
+}
+
+@media (max-width: 600px) {
+    main {
+        flex-direction: column;
+        gap: 35px;
+        padding: 20px;
+    }
+
+    .wheel-section {
+        width: 100%;
+    }
+
+    .wheel-container {
+        width: min(440px, 85vw);
+    }
+
+    .settings {
+        width: 350px;
+        max-width: 100%;
+        padding: 25px;
+    }
+}
+
+.popup-overlay {
+    display: none;
+    position: fixed;
+    inset: 0px;
+    background: rgba(0, 0, 0, 0.85);
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 9999;
+}
+
+.popup-box {
+    width: 380px;
+    max-width: 100%;
+    padding: 30px 20px;
+    border: 2px solid #d8b56b;
+    border-radius: 16px;
+    background: #19191f;
+    text-align: center;
+    box-shadow: 0px 0px 35px #745723;
+}
+
+.popup-box h2 {
+    color: #e5c477;
+}
+
+#winnerName {
+    color: white;
+    font-size: 28px;
+    font-weight: bold;
+    overflow-wrap: anywhere;
+}
+
+.popup-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.popup-buttons button {
+    width: 100%;
+}
+
+#keepWinnerButton {
+    background: #292a32;
+    color: #f5f0df;
+    border-color: #68675f;
+}
+
+.control-group {
+    margin-top: 20px;
+    text-align: left;
+}
+
+.control-group label {
+    display: block;
+    margin-bottom: 10px;
+    color: #e5c477;
+    font-size: 14px;
     font-weight: bold;
 }
+
+#spinSpeed {
+    width: 100%;
+    accent-color: #d8b56b;
+    cursor: pointer;
+}
+
+#speedValue {
+    color: #f5f0df;
+    font-size: 13px;
+    text-align: center;
+}
+
+#prizePictures {
+    width: 100%;
+    color: #f5f0df;
+    font-size: 12px;
+}
+
+.prize-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.prize-picture {
+    width: 38px;
+    height: 38px;
+    object-fit: cover;
+    border: 1px solid #f0dba4;
+    border-radius: 6px;
+}
+
+.prize-name {
+    display: block;
+    width: 100%;
+    text-align: center;
+}
+.picture-gallery {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 15px;
+    max-height: 350px;
+    overflow-y: auto;
+}
+
+.picture-card {
+    min-width: 0;
+    padding: 8px;
+    background: #0c0d12;
+    border: 1px solid #51452e;
+    border-radius: 8px;
+}
+
+.picture-card img {
+    width: 100%;
+    height: 85px;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+.picture-card p {
+    font-size: 11px;
+    overflow-wrap: anywhere;
+}
+
+.picture-card button {
+    width: 100%;
+    padding: 8px 4px;
+    font-size: 10px;
+}
+
+.prize-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+
+.prize-picture {
+    width: 32px;
+    height: 32px;
+    object-fit: cover;
+    border: 1px solid #f0dba4;
+    border-radius: 6px;
+}
+
+.prize-name {
+    display: block;
+    width: 100%;
+    color: #fff8e5;
+    font-size: 10px;
+    text-align: center;
+    overflow-wrap: anywhere;
+}
+
+.winner-picture {
+    width: 140px;
+    height: 140px;
+    max-width: 100%;
+    object-fit: contain;
+    margin: 12px auto;
+    border: 2px solid #d8b56b;
+    border-radius: 10px;
+}
+

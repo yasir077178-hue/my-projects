@@ -1,44 +1,48 @@
+
 <!DOCTYPE html>
 <html>
 <head>
     <title>My Programs</title>
-    <link rel="stylesheet" href="menu bar style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="menu%20bar%20style.css">
 </head>
 
 <body>
 
-    <div id="menu">
+<div id="menu">
+    <div id="logo">MY PROGRAMS</div>
 
-        <div id="logo">MY PROGRAMS</div>
+    <button onclick="showHome()">Home</button>
+    <button onclick="showCalculator()">Calculator</button>
+    <button onclick="showPinball()">Pinball</button>
+    <button onclick="showspinwheel()">Spin Wheel</button>
+</div>
 
-        <button onclick="showHome()">Home</button>
-        <button onclick="showCalculator()">Calculator</button>
-        <button onclick="showPinball()">Pinball</button>
+<div id="content">
+    <h1>Welcome to My Programs</h1>
+</div>
 
-    </div>
-
-    <div id="content">
-        <h1>Welcome to My Programs</h1>
-    </div>
-
-    <script>
-
-        function showHome() {
-            document.getElementById("content").innerHTML =
+<script>
+    function showHome() {
+        document.getElementById("content").innerHTML =
             "<h1>Welcome to My Programs</h1>";
-        }
+    }
 
-        function showCalculator() {
-            document.getElementById("content").innerHTML =
+    function showCalculator() {
+        document.getElementById("content").innerHTML =
             '<iframe src="../calculator/calculator.html"></iframe>';
-        }
+    }
 
-        function showPinball() {
-            document.getElementById("content").innerHTML =
+    function showPinball() {
+        document.getElementById("content").innerHTML =
             '<iframe src="../pinball/pinball.html"></iframe>';
-        }
+    }
 
-    </script>
+    function showspinwheel() {
+        document.getElementById("content").innerHTML =
+            '<iframe src="../spin wheel/spin.html"></iframe>';
+    }
+</script>
 
 </body>
 </html>
