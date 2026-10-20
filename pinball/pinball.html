@@ -1,66 +1,189 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jurassic Pinball</title>
     <link rel="stylesheet" href="style.css">
 </head>
 
-<body>
+<body class="game-page">
+<main class="game-shell">
 
-<h1>🦖 JURASSIC PINBALL 🦖</h1>
+    <header class="game-header">
+        <div class="brand-mark" aria-hidden="true">JP</div>
 
-<div id="info">
-    <div>SCORE <span id="score">0</span></div>
-    <div>LIVES <span id="lives">3</span></div>
-    <div>TIME <span id="time">0 sec</span></div>
-</div>
+        <div class="heading-group">
+            <div class="eyebrow">CRETACEOUS ARCADE</div>
+            <h1>JURASSIC <span>PINBALL</span></h1>
+        </div>
 
-<div id="gameboard">
+        <div class="header-actions">
+            <button id="historyButton" class="small-button" type="button">
+                SCORE LOG
+            </button>
 
-    <div class="wall wall1"></div>
-    <div class="wall wall2"></div>
-    <div class="wall wall3"></div>
-    <div class="wall wall4"></div>
+            <button id="restartButton" class="small-button" type="button">
+                RESTART
+            </button>
+        </div>
+    </header>
 
-    <div class="pipe pipe1"></div>
-    <div class="pipe pipe2"></div>
+    <section class="stats-row" aria-label="Game statistics">
+        <div class="stat-box">
+            <span>SCORE</span>
+            <strong id="score">0</strong>
+        </div>
 
-    <div class="bumper bumper1"></div>
-    <div class="bumper bumper2"></div>
-    <div class="bumper bumper3"></div>
-    <div class="bumper bumper4"></div>
-    <div class="bumper bumper5"></div>
-    <div class="bumper bumper6"></div>
-    <div class="bumper bumper7"></div>
+        <div class="stat-box">
+            <span>AMBER LIVES</span>
+            <strong id="lives">3</strong>
+        </div>
 
-    <div id="leftflipper"></div>
-    <div id="rightflipper"></div>
+        <div class="stat-box">
+            <span>TIME</span>
+            <strong id="time">0:00</strong>
+        </div>
 
-    <div id="launcher">
-        <div id="launcherSpring"></div>
-        <div id="launcherPlunger"></div>
+        <div class="stat-box status-box">
+            <span>EXPEDITION</span>
+            <strong id="statusText">LOAD BALL</strong>
+        </div>
+    </section>
+
+    <div class="board-wrap">
+        <div id="boardHolder">
+            <section id="board" aria-label="Jurassic pinball playfield">
+
+                <div class="canopy canopy-left"></div>
+                <div class="canopy canopy-right"></div>
+
+                <div class="board-title-plaque">
+                    <span>⚒</span> THE LOST WORLD <span>⚒</span>
+                </div>
+
+                <svg class="board-dino" viewBox="0 0 250 150" aria-hidden="true">
+                    <path d="M18 126 L44 108 63 111 82 90 105 83 120 62 141 53 158 59 174 48 193 57 205 72 230 80 237 92 222 100 202 94 184 98 170 118 167 140 151 140 145 112 129 99 111 111 104 141 87 141 83 113 64 125 50 141 35 141 37 129 Z M176 50 L182 31 198 18 216 26 222 38 209 49 192 46 Z" fill="#13271a" stroke="#a6b679" stroke-width="2"/>
+                    <circle cx="211" cy="32" r="2.8" fill="#e4c16b"/>
+                </svg>
+
+                <div class="fossil-stamp fossil-one">
+                    TRIASSIC<br><b>◆</b>
+                </div>
+
+                <div class="fossil-stamp fossil-two">
+                    FOSSIL<br><b>✦</b>
+                </div>
+
+                <!-- Launcher tube -->
+                <div id="launcherTrack" aria-label="Spring launcher lane">
+                    <div class="launcher-top-arch"></div>
+
+                    <div class="launcher-rail rail-left"></div>
+                    <div class="launcher-rail rail-right"></div>
+
+                    <div class="launcher-label">
+                        PULL<br>TO FIRE
+                    </div>
+
+                    <div class="launcher-spring" id="launcherSpring">
+                        <i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+                    </div>
+
+                    <div class="launcher-plunger" id="launcherPlunger">
+                        <div class="plunger-shaft"></div>
+                        <div class="plunger-handle"></div>
+                    </div>
+                </div>
+
+                <!-- Amber bumpers -->
+                <div class="bumper amber-bumper" data-bumper="1" style="left:128px;top:126px"><span>✦</span></div>
+                <div class="bumper amber-bumper" data-bumper="2" style="left:272px;top:104px"><span>✦</span></div>
+                <div class="bumper amber-bumper" data-bumper="3" style="left:437px;top:139px"><span>✦</span></div>
+
+                <!-- Fossil bumpers -->
+                <div class="bumper fossil-bumper" data-bumper="4" style="left:203px;top:277px"><span>ᛉ</span></div>
+                <div class="bumper amber-bumper" data-bumper="5" style="left:431px;top:327px"><span>✦</span></div>
+                <div class="bumper fossil-bumper" data-bumper="6" style="left:121px;top:466px"><span>ᛉ</span></div>
+
+                <!-- Jungle vines -->
+                <div class="vine vine-one"></div>
+                <div class="vine vine-two"></div>
+                <div class="vine vine-three"></div>
+
+                <!-- Connected left flipper assembly -->
+                <div id="leftflipper" class="flipper left-flipper" aria-label="Left flipper">
+                    <div class="flipper-blade"></div>
+                    <div class="flipper-rod"></div>
+                    <div class="flipper-pivot"></div>
+                </div>
+
+                <!-- Connected right flipper assembly -->
+                <div id="rightflipper" class="flipper right-flipper" aria-label="Right flipper">
+                    <div class="flipper-blade"></div>
+                    <div class="flipper-rod"></div>
+                    <div class="flipper-pivot"></div>
+                </div>
+
+                <div id="ball" aria-label="Pinball"></div>
+                <div class="drain-mark">DRAIN</div>
+
+                <div id="gameMessage" class="game-message">
+                    HOLD ↓ TO CHARGE THE SPRING
+                </div>
+
+            </section>
+        </div>
     </div>
 
-    <div id="ball"></div>
+    <div class="controls-row">
+        <button id="leftButton" class="control-button" type="button">
+            ◀ LEFT FLIP
+        </button>
 
+        <button id="launchButton" class="control-button launch-control" type="button">
+            HOLD TO LAUNCH
+        </button>
+
+        <button id="rightButton" class="control-button" type="button">
+            RIGHT FLIP ▶
+        </button>
+    </div>
+
+    <p class="instructions">
+        Touch and hold LEFT FLIP or RIGHT FLIP.
+        Hold LAUNCH to charge, then release to fire.
+    </p>
+
+</main>
+
+<!-- Score history -->
+<div id="historyPanel" class="modal-panel" hidden>
+    <div class="modal-card">
+        <div class="modal-heading">
+            <h2>EXPEDITION LOG</h2>
+            <button id="closeHistoryButton" class="close-button" type="button" aria-label="Close">×</button>
+        </div>
+
+        <div id="historyList" class="history-list"></div>
+    </div>
 </div>
 
-<div id="controls">
-    <span>← LEFT FLIPPER</span>
-    <span>↓ LAUNCH</span>
-    <span>RIGHT FLIPPER →</span>
-</div>
+<!-- Game-over panel -->
+<div id="gameOverPanel" class="modal-panel" hidden>
+    <div class="modal-card game-over-card">
+        <div class="eyebrow">EXPEDITION ENDED</div>
+        <h2>THE JUNGLE WINS</h2>
+        <p id="finalScore">Score: 0</p>
 
-<button id="restartButton">RESTART</button>
-<button id="historyButton">HISTORY</button>
+        <button id="playAgainButton" class="small-button gold-button" type="button">
+            PLAY AGAIN
+        </button>
 
-<div id="historyPanel">
-    <h2>GAME HISTORY</h2>
-    <div id="historylist"></div>
-    <button id="closeHistory">BACK</button>
+        <a class="back-link" href="start.html">Back to start</a>
+    </div>
 </div>
 
 <script src="script.js"></script>
-
 </body>
 </html>

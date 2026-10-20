@@ -1,47 +1,240 @@
-
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>My Programs</title>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YASIR HUB</title>
     <link rel="stylesheet" href="menu%20bar%20style.css">
 </head>
-
 <body>
 
-<div id="menu">
-    <div id="logo">MY PROGRAMS</div>
+<header id="menu">
+    <div id="logo">YASIR <span>HUB</span></div>
 
-    <button onclick="showHome()">Home</button>
-    <button onclick="showCalculator()">Calculator</button>
-    <button onclick="showPinball()">Pinball</button>
-    <button onclick="showspinwheel()">Spin Wheel</button>
-</div>
+    <nav>
+        <button onclick="showHome()">Home</button>
+        <button onclick="openApp('../calculator/calculator.html')">
+            Calculator
+        </button>
+        <button onclick="openApp('../pinball/start.html')">
+            Pinball
+        </button>
+        <button onclick="openApp('../spin wheel/spin.html')">
+            Spin Wheel
+        </button>
+        <button onclick="openApp('../family budget/budget.html')">
+            Family Budget
+        </button>
+    </nav>
+</header>
 
-<div id="content">
-    <h1>Welcome to My Programs</h1>
-</div>
+<main id="content">
+
+    <section id="home">
+        <div class="hero">
+            <p class="eyebrow">WELCOME TO YOUR DIGITAL WORLD</p>
+
+            <h1>Welcome to YASIR HUB!</h1>
+
+            <p class="hero-subtitle">
+                Your useful apps, all in one place.
+            </p>
+
+            <p class="hero-description">
+                Welcome to Yasir Hub! This is your one-stop place to explore
+                useful apps for your daily needs, make everyday tasks easier,
+                and enjoy your free time with fun and entertainment.
+                Whether you want to get things done or simply relax,
+                Yasir Hub brings everything together in one convenient place.
+            </p>
+
+            <p class="hero-tagline">
+                One Hub. Everyday Use. Endless Fun.
+            </p>
+
+
+            <a href="#projects" class="explore-button">
+                EXPLORE MY APPS ↓
+            </a>
+        </div>
+
+        <section id="projects">
+            <h2>OUR APPS</h2>
+            <p class="section-description">
+                Choose an app and start exploring.
+            </p>
+
+            <div class="app-grid">
+
+                <article class="app-card calculator-card"
+                         onclick="openApp('../calculator/calculator.html')">
+                    <div class="app-logo">🧮</div>
+                    <h3>Calculator</h3>
+                    <p>
+                        Perform calculations quickly with a simple,
+                        easy-to-use calculator.
+                    </p>
+                    <span class="launch">OPEN APP →</span>
+                </article>
+
+                <article class="app-card pinball-card"
+                         onclick="openApp('../pinball/start.html')">
+                    <div class="app-logo">🦖</div>
+                    <h3>Jurassic Pinball</h3>
+                    <p>
+                        Enter a prehistoric arcade adventure.
+                        Launch the ball, hit bumpers and score points.
+                    </p>
+                    <span class="launch">PLAY NOW →</span>
+                </article>
+
+                <article class="app-card wheel-card"
+                         onclick="openApp('../spin wheel/spin.html')">
+                    <div class="app-logo">🎡</div>
+                    <h3>Spin Wheel</h3>
+                    <p>
+                        Add your choices, spin the wheel and discover
+                        a random winner.
+                    </p>
+                    <span class="launch">SPIN NOW →</span>
+                </article>
+
+                <article class="app-card budget-card"
+                         onclick="openApp('../family budget/budget.html')">
+                    <div class="app-logo">💰</div>
+                    <h3>Family Budget</h3>
+                    <p>
+                        Organise income and expenses and keep track
+                        of your family's budget.
+                    </p>
+                    <span class="launch">OPEN APP →</span>
+                </article>
+
+            </div>
+        </section>
+
+        <section class="future">
+            <h2>THE VISION</h2>
+            <p>
+                YASIR HUB is a growing collection of creative
+                projects. The goal is to build useful tools,
+                interactive games and better digital experiences
+                one project at a time.
+            </p>
+        </section>
+
+        <footer>© 2026 YASIR HUB · BUILT WITH CREATIVITY</footer>
+    </section>
+
+</main>
 
 <script>
+    const content = document.getElementById("content");
+
     function showHome() {
-        document.getElementById("content").innerHTML =
-            "<h1>Welcome to My Programs</h1>";
+        content.innerHTML = `
+            <section id="home">
+                <div class="hero">
+                    <p class="eyebrow">WELCOME TO YOUR DIGITAL WORLD</p>
+
+<p class="hero-subtitle">
+    Your useful apps, all in one place.
+</p>
+<h1>Welcome to YASIR HUB!</h1>
+<p class="hero-description">
+    Welcome to Yasir Hub! This is your one-stop place to explore
+    useful apps for your daily needs, make everyday tasks easier,
+    and enjoy your free time with fun and entertainment.
+    Whether you want to get things done or simply relax,
+    Yasir Hub brings everything together in one convenient place.
+</p>
+
+<p class="hero-tagline">
+    One Hub. Everyday Use. Endless Fun.
+</p>
+
+                    <a href="#projects" class="explore-button">
+                        EXPLORE MY APPS ↓
+                    </a>
+                </div>
+
+                <section id="projects">
+                    <h2>OUR APPS</h2>
+                    <p class="section-description">
+                        Choose an app and start exploring.
+                    </p>
+
+                    <div class="app-grid">
+                        <article class="app-card calculator-card"
+                            onclick="openApp('../calculator/calculator.html')">
+                            <div class="app-logo">🧮</div>
+                            <h3>Calculator</h3>
+                            <p>Perform calculations quickly with a simple,
+                            easy-to-use calculator.</p>
+                            <span class="launch">OPEN APP →</span>
+                        </article>
+
+                        <article class="app-card pinball-card"
+                            onclick="openApp('../pinball/start.html')">
+                            <div class="app-logo">🦖</div>
+                            <h3>Jurassic Pinball</h3>
+                            <p>Launch the ball, hit bumpers and score
+                            points in a prehistoric arcade adventure.</p>
+                            <span class="launch">PLAY NOW →</span>
+                        </article>
+
+                        <article class="app-card wheel-card"
+                            onclick="openApp('../spin wheel/spin.html')">
+                            <div class="app-logo">🎡</div>
+                            <h3>Spin Wheel</h3>
+                            <p>Add your choices, spin the wheel and
+                            discover a random winner.</p>
+                            <span class="launch">SPIN NOW →</span>
+                        </article>
+
+                        <article class="app-card budget-card"
+                            onclick="openApp('../family budget/budget.html')">
+                            <div class="app-logo">💰</div>
+                            <h3>Family Budget</h3>
+                            <p>Organise income and expenses and track
+                            your family's budget.</p>
+                            <span class="launch">OPEN APP →</span>
+                        </article>
+                    </div>
+                </section>
+
+                <section class="future">
+                    <h2>THE VISION</h2>
+                    <p>YASIR HUB is a growing collection of creative
+                    projects. The goal is to build useful tools,
+                    interactive games and better digital experiences
+                    one project at a time.</p>
+                </section>
+
+                <footer>© 2026 YASIR HUB · BUILT WITH CREATIVITY</footer>
+            </section>
+        `;
+
+        content.scrollTop = 0;
     }
 
-    function showCalculator() {
-        document.getElementById("content").innerHTML =
-            '<iframe src="../calculator/calculator.html"></iframe>';
+    function openApp(path) {
+        content.innerHTML = "";
+
+        const frame = document.createElement("iframe");
+        frame.src = path;
+        frame.title = "YASIR HUB application";
+        frame.setAttribute("allowfullscreen", "");
+        frame.setAttribute("allow", "fullscreen");
+        frame.style.width = "100%";
+        frame.style.height = "100%";
+        frame.style.display = "block";
+        frame.style.border = "0";
+
+        content.appendChild(frame);
     }
 
-    function showPinball() {
-        document.getElementById("content").innerHTML =
-            '<iframe src="../pinball/pinball.html"></iframe>';
-    }
-
-    function showspinwheel() {
-        document.getElementById("content").innerHTML =
-            '<iframe src="../spin wheel/spin.html"></iframe>';
-    }
+    showHome();
 </script>
 
 </body>

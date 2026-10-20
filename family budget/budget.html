@@ -1,0 +1,340 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Family Budget | Smart Finance</title>
+  <link rel="stylesheet" href="budget.css">
+  <script src="budget.js" defer></script>
+</head>
+<body>
+<div class="app">
+
+  <aside class="sidebar">
+    <a href="#" class="brand" data-page-link="dashboard">
+      <span class="brand-icon">◆</span>
+      <span>Family<span class="brand-light">Budget</span></span>
+    </a>
+
+    <p class="nav-heading">WORKSPACE</p>
+
+    <nav class="navigation" aria-label="Family Budget navigation">
+      <button class="nav-link active" data-page-link="dashboard">▦ &nbsp; Dashboard</button>
+      <button class="nav-link" data-page-link="transactions">⇄ &nbsp; Transactions</button>
+      <button class="nav-link" data-page-link="budgets">◎ &nbsp; Budget Planner</button>
+      <button class="nav-link" data-page-link="savings">♧ &nbsp; Savings Goals</button>
+    </nav>
+
+    <div class="sidebar-bottom">
+      <div class="privacy-card">
+        <span>🔒</span>
+        <strong>Your data stays local</strong>
+        <p>Transactions are saved in this browser or app.</p>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">PERSONAL FINANCE</p>
+        <h1 id="pageTitle">Family Dashboard</h1>
+        <p class="subtitle" id="pageSubtitle">
+          Plan wisely. Save consistently. Live confidently.
+        </p>
+      </div>
+
+      <div class="month-control">
+        <label for="monthFilter">SELECT MONTH</label>
+        <input type="month" id="monthFilter">
+      </div>
+    </header>
+
+    <!-- DASHBOARD -->
+    <section class="page-section active"
+             id="page-dashboard" data-page="dashboard">
+
+      <section class="welcome-banner">
+        <div>
+          <span class="banner-label">YOUR FINANCIAL OVERVIEW</span>
+          <h2>Make every rupee count.</h2>
+          <p>Keep your household finances organised in one place.</p>
+        </div>
+        <div class="banner-symbol">₹</div>
+      </section>
+
+      <section class="summary-grid">
+
+        <article class="summary-card">
+          <div class="card-top">
+            <span class="card-label">Total Income</span>
+            <span class="card-icon income-icon">↗</span>
+          </div>
+          <h2 id="totalIncome">₹0</h2>
+          <p class="card-foot">Money received this month</p>
+        </article>
+
+        <article class="summary-card">
+          <div class="card-top">
+            <span class="card-label">Total Expenses</span>
+            <span class="card-icon expense-icon">↘</span>
+          </div>
+          <h2 id="totalExpenses">₹0</h2>
+          <p class="card-foot">Money spent this month</p>
+        </article>
+
+        <article class="summary-card">
+          <div class="card-top">
+            <span class="card-label">Remaining Balance</span>
+            <span class="card-icon balance-icon">₹</span>
+          </div>
+          <h2 id="remainingBalance">₹0</h2>
+          <p class="card-foot">Income minus expenses</p>
+        </article>
+
+        <article class="summary-card">
+          <div class="card-top">
+            <span class="card-label">Savings Rate</span>
+            <span class="card-icon savings-icon">%</span>
+          </div>
+          <h2 id="savingsRate">0%</h2>
+          <p class="card-foot">Balance as a share of income</p>
+        </article>
+
+      </section>
+
+      <section class="panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">SPENDING ANALYSIS</p>
+            <h2>Expense Breakdown</h2>
+          </div>
+        </div>
+
+        <div id="expenseChart" class="expense-chart">
+          <p class="empty-message">
+            Add expenses to see your breakdown.
+          </p>
+        </div>
+      </section>
+
+    </section>
+
+    <!-- TRANSACTIONS -->
+    <section class="page-section"
+             id="page-transactions" data-page="transactions" hidden>
+
+      <section class="panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">MONEY MANAGEMENT</p>
+            <h2>Add Transaction</h2>
+          </div>
+          <span class="heading-icon">＋</span>
+        </div>
+
+        <form id="transactionForm">
+
+          <div class="form-row">
+            <div class="field">
+              <label for="transactionType">Transaction Type</label>
+              <select id="transactionType" required>
+                <option value="expense">Expense</option>
+                <option value="income">Income</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="transactionAmount">Amount (₹)</label>
+              <input type="number" id="transactionAmount"
+                     min="0.01" max="1000000000000"
+                     step="0.01" placeholder="e.g. 1500" required>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="transactionTitle">Description</label>
+            <input type="text" id="transactionTitle"
+                   maxlength="80"
+                   placeholder="e.g. Monthly groceries" required>
+          </div>
+
+          <div class="form-row">
+            <div class="field">
+              <label for="transactionCategory">Category</label>
+              <select id="transactionCategory" required>
+                <option value="Food">Food &amp; Groceries</option>
+                <option value="Housing">Housing &amp; Rent</option>
+                <option value="Education">Education</option>
+                <option value="Transport">Transport</option>
+                <option value="Healthcare">Healthcare</option>
+                <option value="Utilities">Bills &amp; Utilities</option>
+                <option value="Shopping">Shopping</option>
+                <option value="Entertainment">Entertainment</option>
+                <option value="Salary">Salary</option>
+                <option value="Business">Business Income</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="transactionDate">Date</label>
+              <input type="date" id="transactionDate" required>
+            </div>
+          </div>
+
+          <button type="submit" class="primary-button full-button">
+            + Add Transaction
+          </button>
+        </form>
+
+        <p id="formMessage" class="form-message" aria-live="polite"></p>
+      </section>
+
+      <section class="panel transaction-panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">RECENT ACTIVITY</p>
+            <h2>Transaction History</h2>
+          </div>
+          <span id="transactionCount" class="count-badge">0 records</span>
+        </div>
+
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Description</th>
+                <th>Category</th>
+                <th>Date</th>
+                <th>Type</th>
+                <th class="amount-column">Amount</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="transactionList"></tbody>
+          </table>
+        </div>
+
+        <p id="emptyTransactions" class="empty-message">
+          No transactions for this month. Add one using the form above.
+        </p>
+      </section>
+
+    </section>
+
+    <!-- BUDGET PLANNER -->
+    <section class="page-section"
+             id="page-budgets" data-page="budgets" hidden>
+
+      <section class="panel narrow-panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">SPENDING CONTROL</p>
+            <h2>Monthly Budget Planner</h2>
+          </div>
+          <span class="heading-icon">◎</span>
+        </div>
+
+        <p class="section-description">
+          Set a spending limit for the selected month and track how much you have used.
+        </p>
+
+        <form id="budgetForm">
+          <div class="field">
+            <label for="budgetLimit">Monthly Expense Limit (₹)</label>
+            <input type="number" id="budgetLimit"
+                   min="0" max="1000000000000" step="0.01"
+                   placeholder="e.g. 30000" required>
+          </div>
+
+          <button type="submit" class="secondary-button full-button">
+            Save Budget
+          </button>
+        </form>
+
+        <div class="budget-overview">
+          <div class="budget-numbers">
+            <span>Spent</span>
+            <strong id="budgetSpent">₹0</strong>
+          </div>
+
+          <div class="progress-track">
+            <div class="progress-fill" id="budgetProgress"></div>
+          </div>
+
+          <div class="budget-numbers">
+            <span id="budgetRemainingLabel">Budget remaining</span>
+            <strong id="budgetRemaining">₹0</strong>
+          </div>
+
+          <p id="budgetMessage" class="budget-message">
+            Set a monthly spending limit to track your budget.
+          </p>
+        </div>
+      </section>
+
+    </section>
+
+    <!-- SAVINGS GOALS -->
+    <section class="page-section"
+             id="page-savings" data-page="savings" hidden>
+
+      <section class="panel narrow-panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">FUTURE PLANNING</p>
+            <h2>Savings Goals</h2>
+          </div>
+          <span class="heading-icon">♧</span>
+        </div>
+
+        <p class="section-description">
+          Set a savings target and follow your progress using your selected month's balance.
+        </p>
+
+        <form id="savingsForm">
+          <div class="field">
+            <label for="savingsTarget">Savings Target (₹)</label>
+            <input type="number" id="savingsTarget"
+                   min="0" max="1000000000000" step="0.01"
+                   placeholder="e.g. 10000" required>
+          </div>
+
+          <button type="submit" class="secondary-button full-button">
+            Save Target
+          </button>
+        </form>
+
+        <div class="savings-result">
+          <div class="savings-circle" id="savingsCircle">
+            <span id="savingsProgress">0%</span>
+          </div>
+
+          <div>
+            <p class="muted">Current monthly balance</p>
+            <h3 id="savingsCurrent">₹0</h3>
+            <p class="muted">
+              Target: <strong id="savingsTargetText">₹0</strong>
+            </p>
+          </div>
+        </div>
+
+        <p id="savingsMessage" class="budget-message">
+          Set a savings target to begin.
+        </p>
+      </section>
+
+    </section>
+
+    <footer class="footer">
+      <p>FAMILY BUDGET · A Household Finance Management Project</p>
+      <p>Made for learning and financial awareness.</p>
+    </footer>
+
+  </main>
+</div>
+</body>
+</html>

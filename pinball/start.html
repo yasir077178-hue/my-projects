@@ -1,59 +1,388 @@
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Jurassic Pinball</title>
-    <style> 
-        body {
-            margin: 0px;
-            background: #0b1008;
-            color: white;
-            font-family: Arial;
-            text-align: center;
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jurassic Pinball — Expedition Start</title>
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        body.start-page {
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            padding: 24px;
+            overflow: auto;
+            box-sizing: border-box;
         }
 
-        h1 {
-            margin-top: 220px;
-            font-size: 58px;
-            color: #d6a936;
-            text-shadow: 0px 0px 20px #d6a936;
+        .start-card {
+            width: min(900px, 100%);
+            min-height: 540px;
+            overflow: hidden;
+            border: 1px solid #566b43;
+            border-radius: 28px;
+            background: linear-gradient(135deg, #0e1f15, #050f0d);
+            box-shadow: 0 30px 90px #000a, inset 0 0 0 8px #1a2b1e;
+            display: grid;
+            grid-template-columns: 1.05fr .95fr;
         }
 
-        p {
-            font-size: 22px;
-            color: #aab49d;
+        .start-copy {
+            padding: 42px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
         }
 
-        button {
-            margin-top: 30px;
-            padding: 18px 50px;
-            border: 3px solid #d6a936;
-            border-radius: 12px;
-            background: #d6a936;
-            color: #10150d;
-            font-size: 24px;
+        .eyebrow {
+            color: #d9b768;
+            letter-spacing: 3px;
+            font-size: 12px;
+            font-weight: 900;
+        }
+
+        .start-title {
+            font-family: Georgia, serif;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: clamp(40px, 5vw, 65px);
+            line-height: .94;
+            color: #e8d59a;
+            text-shadow: 0 4px 0 #4e3d1a;
+            margin: 20px 0;
+        }
+
+        .start-title span {
+            color: #8aa875;
+            display: block;
+        }
+
+        .start-description {
+            line-height: 1.6;
+            color: #c3cbb7;
+            font-size: 15px;
+        }
+
+        .device-heading {
+            color: #e8d59a;
             font-weight: bold;
-            cursor: pointer;
+            margin-top: 22px;
+            margin-bottom: 12px;
         }
 
-        button:hover {
-            transform: scale(1.06);
+        .device-options {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 8px;
+            width: 100%;
         }
-    </style> 
+
+        .device-option {
+            min-width: 0;
+            padding: 13px 4px;
+            border: 1px solid #566b43;
+            border-radius: 10px;
+            background: #14271b;
+            color: #dce5d1;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .device-option .device-icon {
+            display: block;
+            font-size: 27px;
+            margin-bottom: 8px;
+        }
+
+        .device-option.selected {
+            border: 2px solid #e8c56c;
+            background: #35452a;
+            color: #fff1bb;
+            box-shadow: 0 0 12px #d5a94d44;
+        }
+
+        .device-option:focus-visible,
+        .start-button:focus-visible {
+            outline: 3px solid white;
+            outline-offset: 3px;
+        }
+
+        .start-button {
+            margin-top: 20px;
+            width: 100%;
+            padding: 15px 12px;
+            border: 2px solid #f1d78a;
+            border-radius: 7px;
+            background: linear-gradient(#d5a94d, #876226);
+            color: #10190f;
+            font-weight: 1000;
+            letter-spacing: 1px;
+            cursor: pointer;
+            box-shadow: 0 5px 0 #3c3018;
+        }
+
+        .start-button:disabled {
+            opacity: .45;
+            cursor: not-allowed;
+        }
+
+        .start-footnote {
+            margin-top: 18px;
+            color: #83927d;
+            font-size: 11px;
+            letter-spacing: 1px;
+        }
+
+        .start-art {
+            position: relative;
+            overflow: hidden;
+            background: radial-gradient(ellipse at 55% 45%, #647b3b, #263e25 35%, #0b1914 72%);
+        }
+
+        .start-art:before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            opacity: .65;
+            background:
+                repeating-linear-gradient(115deg, transparent 0 26px, #91a85c16 27px 29px, transparent 30px 52px),
+                radial-gradient(ellipse at 80% 25%, #b5a24c33, transparent 35%);
+        }
+
+        .moon {
+            position: absolute;
+            width: 170px;
+            height: 170px;
+            border-radius: 50%;
+            top: 72px;
+            left: calc(50% - 85px);
+            background: radial-gradient(circle at 35% 30%, #d6cd8d, #9e9a5b 45%, #4f6440 78%);
+            box-shadow: 0 0 55px #b2ad5c55;
+        }
+
+        .dino-silhouette {
+            position: absolute;
+            width: 94%;
+            max-width: 480px;
+            left: 2%;
+            bottom: 70px;
+            filter: drop-shadow(0 14px 14px #0009);
+        }
+
+        .art-caption {
+            position: absolute;
+            bottom: 25px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            color: #b7c18d;
+            font-size: 11px;
+            letter-spacing: 3px;
+        }
+
+        @media (max-width: 700px) {
+            body.start-page {
+                padding: 12px;
+            }
+
+            .start-card {
+                grid-template-columns: 1fr;
+            }
+
+            .start-copy {
+                padding: 30px 22px;
+            }
+
+            .start-art {
+                min-height: 250px;
+            }
+
+            .moon {
+                top: 25px;
+                width: 110px;
+                height: 110px;
+                left: calc(50% - 55px);
+            }
+
+            .dino-silhouette {
+                bottom: 35px;
+                max-width: 320px;
+            }
+
+            .start-title {
+                font-size: 48px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .device-option {
+                font-size: 11px;
+            }
+
+            .device-option .device-icon {
+                font-size: 23px;
+            }
+        }
+    </style>
 </head>
 
-<body>
+<body class="start-page">
 
-    <h1>🦖 JURASSIC PINBALL 🦖</h1>
+<main class="start-card">
 
-    <p>Enter the prehistoric pinball arena</p>
+    <section class="start-copy">
 
-    <button onclick="startGame()">START GAME</button>
+        <div class="eyebrow">
+            FIELD EXPEDITION 07 · CRETACEOUS
+        </div>
 
-    <script>
-        function startGame() {
-            window.location.href = "pinball.html";
-        }
-    </script>
+        <h1 class="start-title">
+            Jurassic
+            <span>Pinball</span>
+        </h1>
 
-</body>
-</html>
+        <p class="start-description">
+            Enter a lost world of fossil bumpers, ancient stone rails
+            and glowing amber. Charge the spring launcher, fire the ball,
+            and keep it away from the jungle floor.
+        </p>
+
+        <div class="device-heading">
+            Choose Your Device
+        </div>
+
+        <div class="device-options">
+
+            <button class="device-option"
+                    data-device="phone"
+                    type="button"
+                    aria-pressed="false">
+                <span class="device-icon">▯</span>
+                Phone
+            </button>
+
+            <button class="device-option"
+                    data-device="tablet"
+                    type="button"
+                    aria-pressed="false">
+                <span class="device-icon">▭</span>
+                Tablet
+            </button>
+
+            <button class="device-option"
+                    data-device="computer"
+                    type="button"
+                    aria-pressed="false">
+                <span class="device-icon">▣</span>
+                Computer
+            </button>
+
+        </div>
+
+        <button id="startButton"
+                class="start-button"
+                type="button"
+                disabled>
+            SELECT A DEVICE FIRST
+        </button>
+
+        <div class="start-footnote">
+            2 FLIPPERS · SPRING PLUNGER · 3 LIVES
+        </div>
+
+    </section>
+
+    <section class="start-art"
+             aria-label="Jurassic landscape illustration">
+
+        <div class="moon"></div>
+
+        <svg class="dino-silhouette"
+             viewBox="0 0 520 330"
+             aria-hidden="true">
+
+            <path fill="#09160e"
+                  d="M35 286 L77 262 109 269 143 242
+                174 236 194 212 223 202 242 164
+                271 145 300 149 322 128 349 139
+                362 164 397 170 415 186 448 187
+                475 205 457 223 416 224 396 210
+                365 211 345 239 341 286 313 286
+                305 239 278 222 254 237 245 286
+                216 286 207 240 176 259 151 286
+                124 286 128 262 105 285 83 286
+                78 306 51 306 58 286 Z"/>
+
+            <path fill="#09160e"
+                  d="M337 143 L343 111 370 91 401 101
+                416 120 401 137 381 137 363 157 Z"/>
+
+            <path fill="#09160e"
+                  d="M393 102 L407 80 420 98 433 91
+                438 116 417 123 Z"/>
+
+            <path fill="#d3bd75"
+                  d="M421 109 L427 111 423 116 Z"/>
+
+            <path fill="#09160e"
+                  d="M163 238 L146 197 123 181 93 177
+                63 158 40 165 65 190 97 207
+                113 238 126 259 Z"/>
+
+            <path fill="#09160e"
+                  d="M284 220 L304 204 322 210
+                332 231 320 246 302 241 Z"/>
+
+        </svg>
+
+        <div class="art-caption">
+            THE LOST WORLD AWAITS
+        </div>
+
+    </section>
+
+</main>
+
+<script>
+    let selectedDevice = "";
+
+    const deviceButtons =
+        document.querySelectorAll(".device-option");
+
+    const startButton =
+        document.getElementById("startButton");
+
+    deviceButtons.forEach(button => {
+
+        button.addEventListener("click", () => {
+
+            selectedDevice = button.dataset.device;
+
+            deviceButtons.forEach(option => {
+                option.classList.remove("selected");
+                option.setAttribute("aria-pressed", "false");
+            });
+
+            button.classList.add("selected");
+            button.setAttribute("aria-pressed", "true");
+
+            startButton.disabled = false;
+            startButton.textContent = "START EXPEDITION →";
+
+        });
+
+    });
+
+    startButton.addEventListener("click", () => {
+
+        if (!selectedDevice) return;
+
+        window.location.href =
+            "pinball.html?device=" + selectedDevice;
+
+    });
+</script>
