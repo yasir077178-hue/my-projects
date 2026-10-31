@@ -678,3 +678,4 @@ document.getElementById("transactionDate").value = getToday();
 
 showPage("dashboard");
 updateDashboard();
+ 
