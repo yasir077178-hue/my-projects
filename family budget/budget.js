@@ -1,681 +1,1463 @@
+/* =========================================================
+   YASIR HUB — FAMILY FINANCE MANAGEMENT
+   Premium Supabase Version
+========================================================= */
 
-"use strict";
+const supabaseReadyWait = setInterval(async () => {
+    if (!window.supabaseClient) return;
 
-const STORAGE_KEY = "familyBudgetDataV1";
+    clearInterval(supabaseReadyWait);
+    await startFamilyFinanceApp();
+}, 100);
 
-const transactionForm = document.getElementById("transactionForm");
-const budgetForm = document.getElementById("budgetForm");
-const savingsForm = document.getElementById("savingsForm");
-const monthFilter = document.getElementById("monthFilter");
-const transactionList = document.getElementById("transactionList");
-const emptyTransactions = document.getElementById("emptyTransactions");
-const transactionCount = document.getElementById("transactionCount");
-const formMessage = document.getElementById("formMessage");
+/* =========================================================
+   APP STATE
+========================================================= */
 
-const categoryColors = [
-  "#74e0a4", "#85c8ff", "#c6a6ff", "#ffbf75",
-  "#ff8585", "#65d6d0", "#e6e878", "#f29bc5"
-];
+async function startFamilyFinanceApp() {
+    const supabase = window.supabaseClient;
 
-const defaultData = {
-  transactions: [],
-  budgets: {},
-  savingsTarget: 0
-};
+    let currentUser = null;
 
-let appData = loadData();
+    let transactions = [];
+    let budgets = [];
+    let savingsGoals = [];
+    let assets = [];
 
-function getToday() {
-  const now = new Date();
+    let assetHistory = [];
+    let assetValuations = [];
 
-  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
-}
+    let selectedMonth = new Date().toISOString().slice(0, 7);
+    let selectedAsset = "null";
+    let selectedPeriod = "1m";
+    let editingAssetId = null;
 
-function getCurrentMonth() {
-  return getToday().slice(0, 7);
-}
+    const $ = id => document.getElementById(id);
 
-function formatMoney(amount) {
-  return new Intl.NumberFormat("en-IN", {
-    style: "currency",
-    currency: "INR",
-    maximumFractionDigits: 2
-  }).format(amount);
-}
+    const money = value =>
+        new Intl.NumberFormat("en-IN", {
+            style: "currency",
+            currency: "INR",
+            maximumFractionDigits: 2
+        }).format(Number(value) || 0);
 
-function formatDate(dateString) {
-  if (!dateString) return "-";
+    const today = () => {
+        const date = new Date();
+        return new Date(
+            date.getTime() - date.getTimezoneOffset() * 60000
+        ).toISOString().slice(0, 10);
+    };
 
-  const parts = dateString.split("-");
+    const monthStart = month => `${month}-01`;
 
-  if (parts.length !== 3) return dateString;
+    function message(id, text, isError = false) {
+        const element = $(id);
+        if (!element) return;
 
-  return new Date(
-    Number(parts[0]),
-    Number(parts[1]) - 1,
-    Number(parts[2])
-  ).toLocaleDateString("en-IN", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric"
-  });
-}
-
-/* LOCAL STORAGE */
-
-function loadData() {
-  try {
-    const saved = localStorage.getItem(STORAGE_KEY);
-
-    if (!saved) {
-      return structuredClone(defaultData);
+        element.textContent = text;
+        element.classList.toggle("error", isError);
     }
 
-    const parsed = JSON.parse(saved);
-
-    if (
-      !parsed ||
-      !Array.isArray(parsed.transactions) ||
-      typeof parsed.budgets !== "object" ||
-      parsed.budgets === null ||
-      typeof parsed.savingsTarget !== "number" ||
-      !Number.isFinite(parsed.savingsTarget)
-    ) {
-      throw new Error("Invalid saved data");
+    function safeNumber(value) {
+        const number = Number(value);
+        return Number.isFinite(number) ? number : 0;
     }
 
-    parsed.transactions = parsed.transactions.filter(item =>
-      item &&
-      typeof item.id === "string" &&
-      typeof item.title === "string" &&
-      typeof item.category === "string" &&
-      (item.type === "income" || item.type === "expense") &&
-      typeof item.amount === "number" &&
-      Number.isFinite(item.amount) &&
-      item.amount > 0 &&
-      item.amount <= 1000000000000 &&
-      typeof item.date === "string" &&
-      /^\d{4}-\d{2}-\d{2}$/.test(item.date)
-    );
-
-    for (const key of Object.keys(parsed.budgets)) {
-      const value = parsed.budgets[key];
-
-      if (
-        !/^\d{4}-\d{2}$/.test(key) ||
-        typeof value !== "number" ||
-        !Number.isFinite(value) ||
-        value < 0 ||
-        value > 1000000000000
-      ) {
-        delete parsed.budgets[key];
-      }
+    function formatDateTime(value) {
+        return new Date(value).toLocaleString("en-IN", {
+            dateStyle: "medium",
+            timeStyle: "short"
+        });
     }
 
-    if (
-      parsed.savingsTarget < 0 ||
-      parsed.savingsTarget > 1000000000000
-    ) {
-      parsed.savingsTarget = 0;
+    function createElement(tag, className, text) {
+        const element = document.createElement(tag);
+
+        if (className) element.className = className;
+        if (text !== undefined) element.textContent = text;
+
+        return element;
     }
 
-    return parsed;
+    /* =====================================================
+       PAGE NAVIGATION
+    ===================================================== */
 
-  } catch (error) {
-    console.error("Could not load saved budget data:", error);
-    return structuredClone(defaultData);
-  }
-}
+    function showPage(page) {
+        document.querySelectorAll("[data-page]").forEach(section => {
+            section.hidden = section.dataset.page !== page;
+            section.classList.toggle(
+                "active",
+                section.dataset.page === page
+            );
+        });
 
-function saveData() {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
-    return true;
-  } catch (error) {
-    console.error("Could not save budget data:", error);
-    return false;
-  }
-}
+        document.querySelectorAll("[data-page-link]").forEach(link => {
+            link.classList.toggle(
+                "active",
+                link.dataset.pageLink === page
+            );
+        });
 
-/* MONTHLY CALCULATIONS */
+        const titles = {
+            dashboard: ["Dashboard", "Your family finance overview"],
+            transactions: ["Transactions", "Track income and expenses"],
+            budgets: ["Budget Planner", "Manage monthly spending"],
+            savings: ["Savings Goals", "Track your savings progress"],
+            assets: ["Assets", "Manage your family's assets"],
+            liabilities: ["Liabilities", "Track outstanding liabilities"],
+            reports: ["Reports", "Review your financial position"],
+            settings: ["Settings", "Manage your account"]
+        };
 
-function getSelectedTransactions() {
-  const month = monthFilter.value;
+        const details = titles[page] || titles.dashboard;
 
-  return appData.transactions.filter(transaction =>
-    transaction.date.startsWith(month)
-  );
-}
+        if ($("pageTitle")) $("pageTitle").textContent = details[0];
+        if ($("pageSubtitle")) $("pageSubtitle").textContent = details[1];
 
-function calculateTotals(transactions) {
-  let income = 0;
-  let expenses = 0;
-
-  transactions.forEach(transaction => {
-    if (transaction.type === "income") {
-      income += transaction.amount;
-    } else {
-      expenses += transaction.amount;
-    }
-  });
-
-  return {
-    income,
-    expenses,
-    balance: income - expenses
-  };
-}
-
-/* DASHBOARD */
-
-function updateDashboard() {
-  const transactions = getSelectedTransactions();
-  const totals = calculateTotals(transactions);
-
-  document.getElementById("totalIncome").textContent =
-    formatMoney(totals.income);
-
-  document.getElementById("totalExpenses").textContent =
-    formatMoney(totals.expenses);
-
-  const balanceElement =
-    document.getElementById("remainingBalance");
-
-  balanceElement.textContent = formatMoney(totals.balance);
-
-  balanceElement.style.color =
-    totals.balance < 0 ? "var(--red)" : "var(--green)";
-
-  const savingsRate = totals.income > 0
-    ? totals.balance / totals.income * 100
-    : 0;
-
-  document.getElementById("savingsRate").textContent =
-    `${savingsRate.toFixed(1)}%`;
-
-  updateBudget(totals);
-  updateSavings(totals);
-  updateExpenseChart(transactions);
-  updateTransactionHistory(transactions);
-}
-
-/* BUDGET PLANNER */
-
-function updateBudget(totals) {
-  const month = monthFilter.value;
-  const budget = appData.budgets[month] ?? 0;
-
-  document.getElementById("budgetLimit").value =
-    budget > 0 ? budget : "";
-
-  document.getElementById("budgetSpent").textContent =
-    formatMoney(totals.expenses);
-
-  const remaining = budget - totals.expenses;
-
-  document.getElementById("budgetRemaining").textContent =
-    formatMoney(remaining);
-
-  document.getElementById("budgetRemainingLabel").textContent =
-    remaining < 0 ? "Over budget by" : "Budget remaining";
-
-  const progress = budget > 0
-    ? totals.expenses / budget * 100
-    : 0;
-
-  const progressElement =
-    document.getElementById("budgetProgress");
-
-  progressElement.style.width =
-    `${Math.min(progress, 100)}%`;
-
-  progressElement.classList.toggle(
-    "over-budget",
-    budget > 0 && totals.expenses > budget
-  );
-
-  const message = document.getElementById("budgetMessage");
-
-  if (budget === 0) {
-    message.textContent =
-      "Set a monthly spending limit to track your budget.";
-  } else if (totals.expenses > budget) {
-    message.textContent =
-      `Budget exceeded by ${formatMoney(totals.expenses - budget)}. Review your spending.`;
-  } else if (progress >= 80) {
-    message.textContent =
-      "Warning: You have used at least 80% of your budget.";
-  } else {
-    message.textContent =
-      `${progress.toFixed(1)}% of your monthly budget used.`;
-  }
-}
-
-budgetForm.addEventListener("submit", function(event) {
-  event.preventDefault();
-
-  const input = document.getElementById("budgetLimit");
-  const amount = input.valueAsNumber;
-
-  if (
-    input.value.trim() === "" ||
-    !Number.isFinite(amount) ||
-    amount < 0 ||
-    amount > 1000000000000
-  ) {
-    alert("Enter a valid monthly budget.");
-    return;
-  }
-
-  const month = monthFilter.value;
-  const previous = appData.budgets[month];
-
-  appData.budgets[month] = amount;
-
-  if (!saveData()) {
-    if (previous === undefined) {
-      delete appData.budgets[month];
-    } else {
-      appData.budgets[month] = previous;
+        if (page === "assets") {
+            renderAssets();
+            renderAssetChart();
+        }
     }
 
-    alert("Could not save your budget.");
-    return;
-  }
-
-  updateDashboard();
-});
-
-/* SAVINGS GOALS */
-
-function updateSavings(totals) {
-  const target = appData.savingsTarget;
-
-  document.getElementById("savingsTarget").value =
-    target > 0 ? target : "";
-
-  document.getElementById("savingsCurrent").textContent =
-    formatMoney(totals.balance);
-
-  document.getElementById("savingsTargetText").textContent =
-    formatMoney(target);
-
-  const percentage = target > 0
-    ? Math.max(0, totals.balance / target * 100)
-    : 0;
-
-  const displayedPercentage = Math.min(percentage, 100);
-
-  document.getElementById("savingsProgress").textContent =
-    `${Math.round(displayedPercentage)}%`;
-
-  document.getElementById("savingsCircle").style.background =
-    `conic-gradient(var(--green) ${displayedPercentage}%, #293730 ${displayedPercentage}%)`;
-
-  const message = document.getElementById("savingsMessage");
-
-  if (target === 0) {
-    message.textContent =
-      "Set a savings target to begin tracking your progress.";
-  } else if (totals.balance < 0) {
-    message.textContent =
-      "Your expenses exceed your income. Review your budget.";
-  } else if (totals.balance >= target) {
-    message.textContent =
-      "Congratulations! Your savings target has been reached.";
-  } else {
-    message.textContent =
-      `${formatMoney(target - totals.balance)} more needed to reach your target.`;
-  }
-}
-
-savingsForm.addEventListener("submit", function(event) {
-  event.preventDefault();
-
-  const input = document.getElementById("savingsTarget");
-  const target = input.valueAsNumber;
-
-  if (
-    input.value.trim() === "" ||
-    !Number.isFinite(target) ||
-    target < 0 ||
-    target > 1000000000000
-  ) {
-    alert("Enter a valid savings target.");
-    return;
-  }
-
-  const previous = appData.savingsTarget;
-  appData.savingsTarget = target;
-
-  if (!saveData()) {
-    appData.savingsTarget = previous;
-    alert("Could not save your savings target.");
-    return;
-  }
-
-  updateDashboard();
-});
-
-/* ADD TRANSACTION */
-
-transactionForm.addEventListener("submit", function(event) {
-  event.preventDefault();
-
-  const type = document.getElementById("transactionType").value;
-  const amountInput = document.getElementById("transactionAmount");
-  const titleInput = document.getElementById("transactionTitle");
-  const category = document.getElementById("transactionCategory").value;
-  const date = document.getElementById("transactionDate").value;
-
-  const amount = amountInput.valueAsNumber;
-  const title = titleInput.value.trim();
-
-  if (type !== "income" && type !== "expense") {
-    showFormMessage("Choose a valid transaction type.", true);
-    return;
-  }
-
-  if (
-    amountInput.value.trim() === "" ||
-    !Number.isFinite(amount) ||
-    amount <= 0 ||
-    amount > 1000000000000
-  ) {
-    showFormMessage("Enter a valid amount greater than zero.", true);
-    return;
-  }
-
-  if (!title || title.length > 80) {
-    showFormMessage("Enter a description of up to 80 characters.", true);
-    return;
-  }
-
-  if (
-    !date ||
-    !/^\d{4}-\d{2}-\d{2}$/.test(date) ||
-    !Number.isFinite(Date.parse(`${date}T00:00:00`))
-  ) {
-    showFormMessage("Choose a valid transaction date.", true);
-    return;
-  }
-
-  if (!category) {
-    showFormMessage("Choose a category.", true);
-    return;
-  }
-
-  const transaction = {
-    id: createId(),
-    type,
-    amount,
-    title,
-    category,
-    date
-  };
-
-  appData.transactions.push(transaction);
-
-  if (!saveData()) {
-    appData.transactions.pop();
-    showFormMessage("Could not save data. Check browser storage settings.", true);
-    return;
-  }
-
-  monthFilter.value = date.slice(0, 7);
-
-  transactionForm.reset();
-  document.getElementById("transactionDate").value = getToday();
-
-  showFormMessage("Transaction added and saved successfully.");
-  updateDashboard();
-});
-
-function createId() {
-  if (window.crypto && typeof window.crypto.randomUUID === "function") {
-    return window.crypto.randomUUID();
-  }
-
-  return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
-}
-
-function showFormMessage(message, isError = false) {
-  formMessage.textContent = message;
-  formMessage.classList.toggle("error", isError);
-}
-
-/* TRANSACTION HISTORY */
-
-function updateTransactionHistory(transactions) {
-  transactionList.replaceChildren();
-
-  const sorted = [...transactions].sort((a, b) =>
-    b.date.localeCompare(a.date) || b.id.localeCompare(a.id)
-  );
-
-  transactionCount.textContent =
-    `${transactions.length} record${transactions.length === 1 ? "" : "s"}`;
-
-  emptyTransactions.hidden = sorted.length > 0;
-
-  sorted.forEach(transaction => {
-    const row = document.createElement("tr");
-
-    const titleCell = document.createElement("td");
-    titleCell.textContent = transaction.title;
-
-    const categoryCell = document.createElement("td");
-    categoryCell.textContent = transaction.category;
-
-    const dateCell = document.createElement("td");
-    dateCell.textContent = formatDate(transaction.date);
-
-    const typeCell = document.createElement("td");
-    const tag = document.createElement("span");
-
-    tag.className = `type-tag type-${transaction.type}`;
-    tag.textContent = transaction.type === "income" ? "Income" : "Expense";
-    typeCell.appendChild(tag);
-
-    const amountCell = document.createElement("td");
-    amountCell.className = "amount-column";
-
-    amountCell.textContent =
-      `${transaction.type === "income" ? "+" : "-"}${formatMoney(transaction.amount)}`;
-
-    amountCell.style.color =
-      transaction.type === "income" ? "var(--green)" : "var(--red)";
-
-    const actionCell = document.createElement("td");
-    const deleteButton = document.createElement("button");
-
-    deleteButton.type = "button";
-    deleteButton.className = "delete-button";
-    deleteButton.textContent = "Delete";
-
-    deleteButton.setAttribute(
-      "aria-label",
-      `Delete transaction: ${transaction.title}`
-    );
-
-    deleteButton.addEventListener("click", function() {
-      deleteTransaction(transaction.id);
+    document.querySelectorAll("[data-page-link]").forEach(link => {
+        link.addEventListener("click", () => {
+            showPage(link.dataset.pageLink);
+        });
     });
 
-    actionCell.appendChild(deleteButton);
+    /* =====================================================
+       MONTH FILTER
+    ===================================================== */
 
-    row.append(
-      titleCell,
-      categoryCell,
-      dateCell,
-      typeCell,
-      amountCell,
-      actionCell
-    );
+    if ($("monthFilter")) {
+        $("monthFilter").value = selectedMonth;
 
-    transactionList.appendChild(row);
-  });
-}
+        $("monthFilter").addEventListener("change", () => {
+            selectedMonth = $("monthFilter").value;
+            renderEverything();
+        });
+    }
 
-function deleteTransaction(id) {
-  const transaction = appData.transactions.find(item => item.id === id);
+    /* =====================================================
+       AUTHENTICATION AND DATABASE LOADING
+    ===================================================== */
 
-  if (!transaction) return;
+    async function loadAllData() {
+        if (!currentUser) return;
 
-  const confirmed = window.confirm(
-    `Delete "${transaction.title}"? This cannot be undone.`
-  );
+        const results = await Promise.all([
+            supabase.from("transactions")
+                .select("*")
+                .eq("user_id", currentUser.id)
+                .order("transaction_date", { ascending: false }),
 
-  if (!confirmed) return;
+            supabase.from("budgets")
+                .select("*")
+                .eq("user_id", currentUser.id),
 
-  const previousTransactions = appData.transactions;
+            supabase.from("savings_goals")
+                .select("*")
+                .eq("user_id", currentUser.id),
 
-  appData.transactions = previousTransactions.filter(
-    item => item.id !== id
-  );
+            supabase.from("assets")
+                .select("*")
+                .eq("user_id", currentUser.id)
+                .order("created_at", { ascending: false }),
 
-  if (!saveData()) {
-    appData.transactions = previousTransactions;
-    alert("Could not save the change. The transaction was not deleted.");
-    return;
-  }
+            supabase.from("asset_history")
+                .select("*")
+                .eq("user_id", currentUser.id)
+                .order("changed_at", { ascending: false }),
 
-  updateDashboard();
-}
+            supabase.from("asset_valuations")
+                .select("*")
+                .eq("user_id", currentUser.id)
+                .order("recorded_at", { ascending: true })
+        ]);
 
-/* EXPENSE BREAKDOWN */
+        const [
+            transactionResult,
+            budgetResult,
+            savingsResult,
+            assetResult,
+            historyResult,
+            valuationResult
+        ] = results;
 
-function updateExpenseChart(transactions) {
-  const chart = document.getElementById("expenseChart");
-  chart.replaceChildren();
+        for (const result of results) {
+            if (result.error) {
+                console.error(result.error);
+                alert("Database error: " + result.error.message);
+                return;
+            }
+        }
 
-  const totals = {};
+        transactions = transactionResult.data || [];
+        budgets = budgetResult.data || [];
+        savingsGoals = savingsResult.data || [];
+        assets = assetResult.data || [];
+        assetHistory = historyResult.data || [];
+        assetValuations = valuationResult.data || [];
 
-  transactions
-    .filter(transaction => transaction.type === "expense")
-    .forEach(transaction => {
-      totals[transaction.category] =
-        (totals[transaction.category] || 0) + transaction.amount;
+        renderEverything();
+    }
+
+    async function initialiseUser() {
+        const { data, error } = await supabase.auth.getSession();
+
+        if (error) {
+            console.error(error);
+            return;
+        }
+
+        currentUser = data.session?.user || null;
+
+        if (currentUser) {
+            await loadAllData();
+        }
+    }
+
+    supabase.auth.onAuthStateChange((event, session) => {
+        if (event === "SIGNED_OUT" || !session) {
+            currentUser = null;
+            transactions = [];
+            budgets = [];
+            savingsGoals = [];
+            assets = [];
+            assetHistory = [];
+            assetValuations = [];
+
+            renderEverything();
+            return;
+        }
+
+        if (event === "SIGNED_IN") {
+            currentUser = session.user;
+            loadAllData();
+        }
     });
 
-  const entries = Object.entries(totals).sort((a, b) => b[1] - a[1]);
+    await initialiseUser();
 
-  const totalExpenses = entries.reduce(
-    (sum, entry) => sum + entry[1],
-    0
-  );
+    /* =====================================================
+       TRANSACTIONS
+    ===================================================== */
 
-  if (entries.length === 0) {
-    const message = document.createElement("p");
-    message.className = "empty-message";
-    message.textContent = "Add expenses to see your breakdown.";
-    chart.appendChild(message);
-    return;
-  }
-
-  entries.forEach(([category, amount], index) => {
-    const percentage = totalExpenses > 0
-      ? amount / totalExpenses * 100
-      : 0;
-
-    const row = document.createElement("div");
-    row.className = "chart-row";
-
-    const label = document.createElement("span");
-    label.className = "chart-label";
-    label.textContent = category;
-
-    const value = document.createElement("span");
-    value.className = "chart-value";
-    value.textContent = formatMoney(amount);
-
-    const track = document.createElement("div");
-    track.className = "chart-track";
-
-    const fill = document.createElement("div");
-    fill.className = "chart-fill";
-    fill.style.width = `${percentage}%`;
-    fill.style.background = categoryColors[index % categoryColors.length];
-    fill.title = `${percentage.toFixed(1)}% of expenses`;
-
-    track.appendChild(fill);
-    row.append(label, value, track);
-    chart.appendChild(row);
-  });
-}
-
-/* MONTH FILTER */
-
-monthFilter.addEventListener("change", function() {
-  if (!monthFilter.value) {
-    monthFilter.value = getCurrentMonth();
-  }
-
-  updateDashboard();
-});
-
-/* INTERNAL PAGE NAVIGATION */
-
-const pageDetails = {
-  dashboard: [
-    "Family Dashboard",
-    "Plan wisely. Save consistently. Live confidently."
-  ],
-  transactions: [
-    "Transactions",
-    "Add, review and manage your income and expenses."
-  ],
-  budgets: [
-    "Budget Planner",
-    "Set a monthly spending limit and monitor expenses."
-  ],
-  savings: [
-    "Savings Goals",
-    "Track progress towards your savings target."
-  ]
-};
-
-function showPage(pageName) {
-  if (!pageDetails[pageName]) {
-    pageName = "dashboard";
-  }
-
-  document.querySelectorAll(".page-section").forEach(section => {
-    const selected = section.dataset.page === pageName;
-
-    section.hidden = !selected;
-    section.classList.toggle("active", selected);
-  });
-
-  document.querySelectorAll("[data-page-link]").forEach(link => {
-    const selected = link.dataset.pageLink === pageName;
-
-    link.classList.toggle("active", selected);
-
-    if (link.tagName === "BUTTON") {
-      link.setAttribute("aria-current", selected ? "page" : "false");
+    function monthTransactions() {
+        return transactions.filter(item =>
+            (item.transaction_date || "").slice(0, 7) === selectedMonth
+        );
     }
-  });
 
-  document.getElementById("pageTitle").textContent =
-    pageDetails[pageName][0];
+    function calculateTotals() {
+        const current = monthTransactions();
 
-  document.getElementById("pageSubtitle").textContent =
-    pageDetails[pageName][1];
+        const income = current
+            .filter(item => item.transaction_type === "income")
+            .reduce((sum, item) => sum + safeNumber(item.amount), 0);
+
+        const expenses = current
+            .filter(item => item.transaction_type === "expense")
+            .reduce((sum, item) => sum + safeNumber(item.amount), 0);
+
+        return {
+            income,
+            expenses,
+            balance: income - expenses,
+            savingsRate: income > 0
+                ? ((income - expenses) / income) * 100
+                : 0
+        };
+    }
+
+    async function addTransaction(event) {
+        event.preventDefault();
+
+        if (!currentUser) return;
+
+        const type = $("transactionType")?.value;
+        const amount = safeNumber($("transactionAmount")?.value);
+        const title = $("transactionTitle")?.value.trim();
+        const category = $("transactionCategory")?.value;
+        const date = $("transactionDate")?.value || today();
+
+        if (!type || amount <= 0 || !title || !category) {
+            message("formMessage", "Enter valid transaction details.", true);
+            return;
+        }
+
+        const { data, error } = await supabase
+            .from("transactions")
+            .insert({
+                user_id: currentUser.id,
+                transaction_type: type,
+                amount,
+                category,
+                note: title,
+                transaction_date: date
+            })
+            .select()
+            .single();
+
+        if (error) {
+            message("formMessage", error.message, true);
+            return;
+        }
+
+        transactions.unshift(data);
+
+        $("transactionForm").reset();
+
+        if ($("transactionDate")) {
+            $("transactionDate").value = today();
+        }
+
+        message("formMessage", "Transaction added successfully.");
+        renderEverything();
+    }
+
+    async function deleteTransaction(id) {
+        if (!confirm("Delete this transaction?")) return;
+
+        const { error } = await supabase
+            .from("transactions")
+            .delete()
+            .eq("id", id)
+            .eq("user_id", currentUser.id);
+
+        if (error) {
+            alert(error.message);
+            return;
+        }
+
+        transactions = transactions.filter(item => item.id !== id);
+        renderEverything();
+    }
+
+    function renderTransactions() {
+        const list = $("transactionList");
+        if (!list) return;
+
+        list.replaceChildren();
+
+        const current = monthTransactions();
+
+        if ($("transactionCount")) {
+            $("transactionCount").textContent = current.length;
+        }
+
+        if ($("emptyTransactions")) {
+            $("emptyTransactions").hidden = current.length !== 0;
+        }
+
+        current.forEach(item => {
+            const row = createElement("div", "transaction-item");
+
+            const details = createElement("div");
+            details.append(
+                createElement("strong", "", item.note || item.category),
+                createElement(
+                    "small",
+                    "",
+                    `${item.category} • ${item.transaction_date}`
+                )
+            );
+
+            const amount = createElement(
+                "strong",
+                item.transaction_type === "income" ? "income" : "expense",
+                `${item.transaction_type === "income" ? "+" : "-"}${money(item.amount)}`
+            );
+
+            const remove = createElement("button", "delete-button", "Delete");
+            remove.type = "button";
+            remove.addEventListener("click", () => deleteTransaction(item.id));
+
+            row.append(details, amount, remove);
+            list.appendChild(row);
+        });
+    }
+
+    if ($("transactionForm")) {
+        $("transactionForm").addEventListener("submit", addTransaction);
+    }
+
+    if ($("transactionDate")) {
+        $("transactionDate").value = today();
+    }
+        /* =====================================================
+       BUDGET PLANNER
+    ===================================================== */
+
+    function getCurrentBudget() {
+        return budgets.find(item =>
+            item.month_starts === monthStart(selectedMonth)
+        );
+    }
+
+    async function saveBudget(event) {
+        event.preventDefault();
+
+        if (!currentUser) return;
+
+        const limit = safeNumber($("budgetLimit")?.value);
+
+        if (limit <= 0) {
+            message("budgetMessage", "Enter a valid budget amount.", true);
+            return;
+        }
+
+        const existing = getCurrentBudget();
+
+        const query = existing
+            ? supabase.from("budgets")
+                .update({ limit_amount: limit })
+                .eq("id", existing.id)
+                .eq("user_id", currentUser.id)
+            : supabase.from("budgets")
+                .insert({
+                    user_id: currentUser.id,
+                    category: "Overall",
+                    month_starts: monthStart(selectedMonth),
+                    limit_amount: limit
+                });
+
+        const { data, error } = await query.select().single();
+
+        if (error) {
+            message("budgetMessage", error.message, true);
+            return;
+        }
+
+        const index = budgets.findIndex(item => item.id === data.id);
+
+        if (index >= 0) budgets[index] = data;
+        else budgets.push(data);
+
+        message("budgetMessage", "Budget saved successfully.");
+        renderEverything();
+    }
+
+    function renderBudget() {
+        const budget = getCurrentBudget();
+        const limit = safeNumber(budget?.limit_amount);
+
+        const spent = monthTransactions()
+            .filter(item => item.transaction_type === "expense")
+            .reduce((sum, item) => sum + safeNumber(item.amount), 0);
+
+        const remaining = limit - spent;
+        const percentage = limit > 0
+            ? Math.min((spent / limit) * 100, 100)
+            : 0;
+
+        if ($("budgetSpent")) $("budgetSpent").value = spent.toFixed(2);
+        if ($("budgetLimit") && budget) {
+            $("budgetLimit").value = limit;
+        }
+
+        if ($("budgetRemaining")) {
+            $("budgetRemaining").textContent = money(Math.abs(remaining));
+        }
+
+        if ($("budgetRemainingLabel")) {
+            $("budgetRemainingLabel").textContent =
+                remaining >= 0 ? "Remaining budget" : "Amount over budget";
+        }
+
+        if ($("budgetProgress")) {
+            $("budgetProgress").style.width = `${percentage}%`;
+            $("budgetProgress").classList.toggle("over-budget", remaining < 0);
+        }
+    }
+
+    if ($("budgetForm")) {
+        $("budgetForm").addEventListener("submit", saveBudget);
+    }
+
+    /* =====================================================
+       SAVINGS GOALS
+    ===================================================== */
+
+    async function saveSavings(event) {
+        event.preventDefault();
+
+        if (!currentUser) return;
+
+        const target = safeNumber($("savingsTarget")?.value);
+
+        if (target <= 0) {
+            message("savingsMessage", "Enter a valid savings target.", true);
+            return;
+        }
+
+        const existing = savingsGoals[0];
+
+        const query = existing
+            ? supabase.from("savings_goals")
+                .update({ targeted_amount: target })
+                .eq("id", existing.id)
+                .eq("user_id", currentUser.id)
+            : supabase.from("savings_goals")
+                .insert({
+                    user_id: currentUser.id,
+                    name: "Family Savings Goal",
+                    targeted_amount: target,
+                    current_amount: 0,
+                    targeted_data: null
+                });
+
+        const { data, error } = await query.select().single();
+
+        if (error) {
+            message("savingsMessage", error.message, true);
+            return;
+        }
+
+        if (existing) savingsGoals[0] = data;
+        else savingsGoals.unshift(data);
+
+        message("savingsMessage", "Savings goal saved successfully.");
+        renderEverything();
+    }
+
+    function renderSavings() {
+        const goal = savingsGoals[0];
+
+        const target = safeNumber(goal?.targeted_amount);
+        const current = safeNumber(goal?.current_amount);
+
+        const percentage = target > 0
+            ? Math.min((current / target) * 100, 100)
+            : 0;
+
+        if ($("savingsCurrent")) {
+            $("savingsCurrent").textContent = money(current);
+        }
+
+        if ($("savingsTargetText")) {
+            $("savingsTargetText").textContent = money(target);
+        }
+
+        if ($("savingsProgress")) {
+            $("savingsProgress").textContent = `${percentage.toFixed(1)}%`;
+        }
+
+        if ($("savingsCircle")) {
+            $("savingsCircle").style.background =
+                `conic-gradient(var(--green) ${percentage}%, var(--border) 0)`;
+        }
+
+        if ($("savingsTarget")) {
+            $("savingsTarget").value = target || "";
+        }
+    }
+
+    if ($("savingsForm")) {
+        $("savingsForm").addEventListener("submit", saveSavings);
+    }
+
+    /* =====================================================
+       ASSET HELPERS
+    ===================================================== */
+
+    function getAssetValue(asset) {
+        return safeNumber(asset.current_value);
+    }
+
+    function getPurchaseValue(asset) {
+        return safeNumber(asset.purchase_price) *
+            safeNumber(asset.quantity || 1);
+    }
+
+    function getAssetById(id) {
+        return assets.find(asset => asset.id === id);
+    }
+
+    async function saveAssetHistory(action, assetId, oldValues, newValues) {
+        const { data, error } = await supabase
+            .from("asset_history")
+            .insert({
+                user_id: currentUser.id,
+                asset_id: assetId,
+                action,
+                old_values: oldValues,
+                new_values: newValues
+            })
+            .select()
+            .single();
+
+        if (error) {
+            console.error("Asset history error:", error);
+            return false;
+        }
+
+        assetHistory.unshift(data);
+        return true;
+    }
+
+    async function saveAssetValuation(assetId, value, source = "manual") {
+        const { data, error } = await supabase
+            .from("asset_valuations")
+            .insert({
+                user_id: currentUser.id,
+                asset_id: assetId,
+                total_value: value,
+                source
+            })
+            .select()
+            .single();
+
+        if (error) {
+            console.error("Asset valuation error:", error);
+            return false;
+        }
+
+        assetValuations.push(data);
+        return true;
+    }
+
+    /* =====================================================
+       ADD / EDIT ASSET
+    ===================================================== */
+
+    async function addAsset(event) {
+        event.preventDefault();
+
+        if (!currentUser) return;
+
+        const name = $("assetName")?.value.trim();
+        const type = $("assetType")?.value;
+        const quantity = safeNumber($("assetQuantity")?.value || 1);
+        const unit = $("assetUnit")?.value || "";
+        const purchasePrice = safeNumber($("assetPurchasePrice")?.value);
+        const currentValue = safeNumber($("assetCurrentValue")?.value);
+        const currency = $("assetCurrency")?.value || "INR";
+
+        const valuationMode = $("assetValuationMode")?.value || "manual";
+
+        if (
+            !name ||
+            !type ||
+            quantity <= 0 ||
+            purchasePrice < 0 ||
+            currentValue < 0
+        ) {
+            message("assetFormMessage", "Enter valid asset details.", true);
+            return;
+        }
+
+        const assetData = {
+            name,
+            asset_type: type,
+            quantity,
+            unit,
+            purchase_price: purchasePrice,
+            current_value: currentValue,
+            currency,
+            valuation_mode: valuationMode === "market"
+                ? "automatic"
+                : valuationMode
+        };
+
+        let result;
+
+        if (editingAssetId) {
+            const oldAsset = getAssetById(editingAssetId);
+
+            if (!oldAsset) return;
+
+            result = await supabase
+                .from("assets")
+                .update(assetData)
+                .eq("id", editingAssetId)
+                .eq("user_id", currentUser.id)
+                .select()
+                .single();
+
+            if (!result.error) {
+                const updatedAsset = result.data;
+
+                assets = assets.map(asset =>
+                    asset.id === editingAssetId ? updatedAsset : asset
+                );
+
+                await saveAssetHistory(
+                    "updated",
+                    updatedAsset.id,
+                    oldAsset,
+                    updatedAsset
+                );
+
+                if (
+                    safeNumber(oldAsset.current_value) !== currentValue
+                ) {
+                    await saveAssetValuation(
+                        updatedAsset.id,
+                        currentValue,
+                        "manual"
+                    );
+                }
+            }
+        } else {
+            result = await supabase
+                .from("assets")
+                .insert({
+                    user_id: currentUser.id,
+                    ...assetData
+                })
+                .select()
+                .single();
+
+            if (!result.error) {
+                const newAsset = result.data;
+                assets.unshift(newAsset);
+
+                await saveAssetHistory(
+                    "created",
+                    newAsset.id,
+                    null,
+                    newAsset
+                );
+
+                await saveAssetValuation(
+                    newAsset.id,
+                    currentValue,
+                    "manual"
+                );
+            }
+        }
+
+        if (result.error) {
+            message("assetFormMessage", result.error.message, true);
+            return;
+        }
+
+        editingAssetId = null;
+
+        $("assetForm").reset();
+
+        const submitButton = $("assetForm").querySelector(
+            'button[type="submit"]'
+        );
+
+        if (submitButton) submitButton.textContent = "Add Asset";
+
+        message(
+            "assetFormMessage",
+            "Asset saved successfully. Graph and history updated."
+        );
+
+        renderEverything();
+    }
+
+    function editAsset(id) {
+        const asset = getAssetById(id);
+        if (!asset) return;
+
+        editingAssetId = id;
+
+        $("assetName").value = asset.name;
+        $("assetType").value = asset.asset_type;
+        $("assetQuantity").value = asset.quantity;
+        $("assetUnit").value = asset.unit || "";
+        $("assetPurchasePrice").value = asset.purchase_price;
+        $("assetCurrentValue").value = asset.current_value;
+        $("assetCurrency").value = asset.currency || "INR";
+
+        $("assetValuationMode").value =
+            asset.valuation_mode === "automatic"
+                ? "market"
+                : asset.valuation_mode;
+
+        const submitButton = $("assetForm").querySelector(
+            'button[type="submit"]'
+        );
+
+        if (submitButton) submitButton.textContent = "Save Changes";
+
+        $("assetForm").scrollIntoView({
+            behavior: "smooth",
+            block: "center"
+        });
+    }
+
+    /* =====================================================
+       DELETE ASSET
+    ===================================================== */
+
+    async function deleteAsset(id) {
+        const asset = getAssetById(id);
+        if (!asset) return;
+
+        if (!confirm(`Delete ${asset.name}? Its linked history will also be deleted.`)) {
+            return;
+        }
+
+        // Preserve the deletion record before deleting the asset.
+        await saveAssetHistory(
+            "deleted",
+            id,
+            asset,
+            null
+        );
+
+        const { error } = await supabase
+            .from("assets")
+            .delete()
+            .eq("id", id)
+            .eq("user_id", currentUser.id);
+
+        if (error) {
+            alert(error.message);
+            return;
+        }
+
+        assets = assets.filter(item => item.id !== id);
+
+        // The database's ON DELETE CASCADE removes linked history
+        // and valuation records for this asset.
+        assetHistory = assetHistory.filter(item => item.asset_id !== id);
+        assetValuations = assetValuations.filter(item => item.asset_id !== id);
+
+        renderEverything();
+    }
+
+    if ($("assetForm")) {
+        $("assetForm").addEventListener("submit", addAsset);
+    }// ==========================================
+// PART 3: ASSETS DISPLAY
+// ==========================================
+
+function renderAssets() {
+    const list = $("assetList");
+    const empty = $("emptyAssets");
+
+    if (!list) return;
+
+    list.replaceChildren();
+
+    const totalValue = assets.reduce(
+        (sum, asset) => sum + getAssetValue(asset),
+        0
+    );
+
+    const totalPurchase = assets.reduce(
+        (sum, asset) => sum + getPurchaseValue(asset),
+        0
+    );
+
+    const profitLoss = totalValue - totalPurchase;
+
+    if ($("totalAssetValue")) {
+        $("totalAssetValue").textContent = money(totalValue);
+    }
+
+    if ($("totalAssetPurchase")) {
+        $("totalAssetPurchase").textContent = money(totalPurchase);
+    }
+
+    if ($("assetProfitLoss")) {
+        $("assetProfitLoss").textContent = money(profitLoss);
+        $("assetProfitLoss").style.color =
+            profitLoss >= 0 ? "var(--green)" : "var(--red)";
+    }
+
+    if (empty) {
+        empty.hidden = assets.length > 0;
+    }
+
+    assets.forEach(asset => {
+        const row = document.createElement("tr");
+
+        const values = [
+            asset.name,
+            String(asset.asset_type || "Other").replaceAll("_", " "),
+            `${safeNumber(asset.quantity)} ${asset.unit || ""}`,
+            money(asset.purchase_price),
+            money(asset.current_value),
+            money(getAssetValue(asset))
+        ];
+
+        values.forEach(value => {
+            const cell = document.createElement("td");
+            cell.textContent = value;
+            row.appendChild(cell);
+        });
+
+        const actions = document.createElement("td");
+
+        const editButton = document.createElement("button");
+        editButton.textContent = "Edit";
+        editButton.type = "button";
+        editButton.className = "edit-button";
+        editButton.addEventListener("click", () => {
+            editAsset(asset.id);
+        });
+
+        const deleteButton = document.createElement("button");
+        deleteButton.textContent = "Delete";
+        deleteButton.type = "button";
+        deleteButton.className = "delete-button";
+        deleteButton.addEventListener("click", () => {
+            deleteAsset(asset.id);
+        });
+
+        actions.append(editButton, deleteButton);
+        row.appendChild(actions);
+
+        list.appendChild(row);
+    });
+
+    renderAssetChart();
 }
 
-document.querySelectorAll("[data-page-link]").forEach(link => {
-  link.addEventListener("click", function(event) {
-    event.preventDefault();
-    showPage(link.dataset.pageLink);
-  });
+
+// ==========================================
+// ASSET HISTORY PANEL
+// ==========================================
+
+function readableValues(values) {
+    if (!values) return "No previous information";
+
+    const labels = {
+        name: "Name",
+        asset_type: "Type",
+        quantity: "Quantity",
+        unit: "Unit",
+        purchase_price: "Purchase price",
+        current_value: "Current value",
+        currency: "Currency",
+        valuation_mode: "Valuation method"
+    };
+
+    return Object.entries(values)
+        .map(([key, value]) => {
+            const label = labels[key] || key;
+            return `${label}: ${value}`;
+        })
+        .join(" | ");
+}
+
+
+function renderAssetHistory() {
+    const container = $("assetHistoryList");
+
+    if (!container) return;
+
+    container.replaceChildren();
+
+    let records = [...assetHistory];
+
+    if (selectedAsset) {
+        records = records.filter(
+            item => item.asset_id === selectedAsset
+        );
+    }
+
+    records.sort(
+        (a, b) =>
+            new Date(b.changed_at) - new Date(a.changed_at)
+    );
+
+    if (records.length === 0) {
+        const messageElement = document.createElement("p");
+        messageElement.textContent = "No history available yet.";
+        container.appendChild(messageElement);
+        return;
+    }
+
+    records.forEach(record => {
+        const card = document.createElement("div");
+        card.className = "history-card";
+
+        const heading = document.createElement("h4");
+        heading.textContent =
+            `${record.action || "Updated"} – ${
+                formatDateTime(record.changed_at)
+            }`;
+
+        const oldValues = document.createElement("p");
+        oldValues.textContent =
+            "Previous: " + readableValues(record.old_values);
+
+        const newValues = document.createElement("p");
+        newValues.textContent =
+            "New: " + readableValues(record.new_values);
+
+        card.append(heading, oldValues, newValues);
+        container.appendChild(card);
+    });
+}
+
+
+$("assetHistoryButton")?.addEventListener("click", () => {
+    const panel = $("assetHistoryPanel");
+
+    if (panel) {
+        panel.hidden = !panel.hidden;
+        renderAssetHistory();
+    }
 });
 
-/* START APPLICATION */
 
-monthFilter.value = getCurrentMonth();
-document.getElementById("transactionDate").value = getToday();
+$("closeAssetHistory")?.addEventListener("click", () => {
+    if ($("assetHistoryPanel")) {
+        $("assetHistoryPanel").hidden = true;
+    }
+});
+
+
+// ==========================================
+// ASSET VALUE GRAPH
+// ==========================================
+
+function getPeriodStart(period) {
+    const date = new Date();
+
+    if (period === "1m") {
+        date.setMonth(date.getMonth() - 1);
+    } else if (period === "6m") {
+        date.setMonth(date.getMonth() - 6);
+    } else if (period === "1y") {
+        date.setFullYear(date.getFullYear() - 1);
+    } else {
+        return null;
+    }
+
+    return date;
+}
+
+
+function getAssetGraphData() {
+    const records = [...assetValuations].sort(
+        (a, b) =>
+            new Date(a.recorded_at) - new Date(b.recorded_at)
+    );
+
+    if (selectedAsset) {
+        return records
+            .filter(item => item.asset_id === selectedAsset)
+            .map(item => ({
+                date: new Date(item.recorded_at),
+                value: safeNumber(item.total_value)
+            }));
+    }
+
+    const latestValues = {};
+    const points = [];
+
+    records.forEach(record => {
+        latestValues[record.asset_id] =
+            safeNumber(record.total_value);
+
+        const total = Object.values(latestValues).reduce(
+            (sum, value) => sum + value,
+            0
+        );
+
+        points.push({
+            date: new Date(record.recorded_at),
+            value: total
+        });
+    });
+
+    return points;
+}
+
+
+function renderAssetChart() {
+    const container = $("assetChart");
+
+    if (!container) return;
+
+    container.replaceChildren();
+
+    // Controls
+    const controls = document.createElement("div");
+    controls.className = "asset-chart-controls";
+
+    const selector = document.createElement("select");
+    selector.setAttribute("aria-label", "Select asset");
+
+    const allOption = document.createElement("option");
+    allOption.value = "";
+    allOption.textContent = "All Assets";
+    selector.appendChild(allOption);
+
+    assets.forEach(asset => {
+        const option = document.createElement("option");
+        option.value = asset.id;
+        option.textContent = asset.name;
+        selector.appendChild(option);
+    });
+
+    selector.value = selectedAsset || "";
+
+    selector.addEventListener("change", () => {
+        selectedAsset = selector.value || null;
+        renderAssetChart();
+        renderAssetHistory();
+    });
+
+    controls.appendChild(selector);
+
+    const periods = [
+        ["1m", "1 Month"],
+        ["6m", "6 Months"],
+        ["1y", "1 Year"],
+        ["all", "All Time"]
+    ];
+
+    periods.forEach(([value, label]) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.textContent = label;
+        button.className =
+            selectedPeriod === value ? "active" : "";
+
+        button.addEventListener("click", () => {
+            selectedPeriod = value;
+            renderAssetChart();
+        });
+
+        controls.appendChild(button);
+    });
+
+    container.appendChild(controls);
+
+    // Graph data
+    let data = getAssetGraphData();
+
+    const startDate = getPeriodStart(selectedPeriod);
+
+    if (startDate) {
+        data = data.filter(
+            point => point.date >= startDate
+        );
+    }
+
+    if (data.length === 0) {
+        const messageElement = document.createElement("p");
+        messageElement.textContent =
+            "Asset value history will appear here after valuation records are created.";
+
+        container.appendChild(messageElement);
+        return;
+    }
+
+    const width = 700;
+    const height = 260;
+    const padding = 45;
+
+    const values = data.map(point => point.value);
+
+    const minimum = Math.min(...values);
+    const maximum = Math.max(...values);
+
+    const range = maximum - minimum || 1;
+
+    const xPosition = index => {
+        if (data.length === 1) return width / 2;
+
+        return padding +
+            (index / (data.length - 1)) *
+            (width - padding * 2);
+    };
+
+    const yPosition = value => {
+        return height - padding -
+            ((value - minimum) / range) *
+            (height - padding * 2);
+    };
+
+    const svg = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "svg"
+    );
+
+    svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+    svg.setAttribute("role", "img");
+    svg.setAttribute(
+        "aria-label",
+        selectedAsset
+            ? "Selected asset value history"
+            : "Total asset value history"
+    );
+
+    const points = data.map((point, index) => {
+        return `${xPosition(index)},${yPosition(point.value)}`;
+    }).join(" ");
+
+    const line = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "polyline"
+    );
+
+    line.setAttribute("points", points);
+    line.setAttribute("fill", "none");
+    line.setAttribute("stroke", "#74e0a4");
+    line.setAttribute("stroke-width", "3");
+    line.setAttribute("stroke-linecap", "round");
+    line.setAttribute("stroke-linejoin", "round");
+
+    svg.appendChild(line);
+
+    data.forEach((point, index) => {
+        const circle = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "circle"
+        );
+
+        circle.setAttribute("cx", xPosition(index));
+        circle.setAttribute("cy", yPosition(point.value));
+        circle.setAttribute("r", "5");
+        circle.setAttribute("fill", "#74e0a4");
+
+        const previousValue =
+            index > 0 ? data[index - 1].value : null;
+
+        const difference = previousValue === null
+            ? "First recorded value"
+            : money(point.value - previousValue);
+
+        const tooltip = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "title"
+        );
+
+        tooltip.textContent =
+            `${formatDateTime(point.date)}\n` +
+            `Value: ${money(point.value)}\n` +
+            `Difference: ${difference}`;
+
+        circle.appendChild(tooltip);
+        svg.appendChild(circle);
+    });
+
+    container.appendChild(svg);
+
+    const latest = data[data.length - 1];
+
+    const summary = document.createElement("p");
+    summary.textContent =
+        `Latest recorded value: ${money(latest.value)} – ` +
+        `${formatDateTime(latest.date)}`;
+
+    container.appendChild(summary);
+}
+
+
+// ==========================================
+// DASHBOARD
+// ==========================================
+
+function renderExpenseChart() {
+    const chart = $("expenseChart");
+
+    if (!chart) return;
+
+    chart.replaceChildren();
+
+    const expenses = getMonthTransactions().filter(
+        item => item.transaction_type === "expense"
+    );
+
+    const categories = {};
+
+    expenses.forEach(item => {
+        const category = item.category || "Other";
+
+        categories[category] =
+            (categories[category] || 0) +
+            safeNumber(item.amount);
+    });
+
+    const sorted = Object.entries(categories).sort(
+        (a, b) => b[1] - a[1]
+    );
+
+    const maximum = Math.max(
+        ...sorted.map(item => item[1]),
+        1
+    );
+
+    if (sorted.length === 0) {
+        const messageElement = document.createElement("p");
+        messageElement.textContent =
+            "No expenses recorded for this month.";
+        chart.appendChild(messageElement);
+        return;
+    }
+
+    sorted.forEach(([category, amount]) => {
+        const row = document.createElement("div");
+        row.className = "chart-row";
+
+        const label = document.createElement("span");
+        label.className = "chart-label";
+        label.textContent = category;
+
+        const track = document.createElement("div");
+        track.className = "chart-track";
+
+        const fill = document.createElement("div");
+        fill.className = "chart-fill";
+
+        fill.style.width =
+            `${(amount / maximum) * 100}%`;
+
+        track.appendChild(fill);
+
+        const value = document.createElement("span");
+        value.className = "chart-value";
+        value.textContent = money(amount);
+
+        row.append(label, track, value);
+        chart.appendChild(row);
+    });
+}
+
+
+function renderDashboard() {
+    const monthTransactions = getMonthTransactions();
+
+    const income = monthTransactions
+        .filter(item => item.transaction_type === "income")
+        .reduce((sum, item) => sum + safeNumber(item.amount), 0);
+
+    const expenses = monthTransactions
+        .filter(item => item.transaction_type === "expense")
+        .reduce((sum, item) => sum + safeNumber(item.amount), 0);
+
+    const balance = income - expenses;
+
+    const savingsRate = income > 0
+        ? (balance / income) * 100
+        : 0;
+
+    if ($("totalIncome")) {
+        $("totalIncome").textContent = money(income);
+    }
+
+    if ($("totalExpenses")) {
+        $("totalExpenses").textContent = money(expenses);
+    }
+
+    if ($("remainingBalance")) {
+        $("remainingBalance").textContent = money(balance);
+    }
+
+    if ($("savingsRate")) {
+        $("savingsRate").textContent =
+            `${Math.max(0, savingsRate).toFixed(1)}%`;
+    }
+
+    renderExpenseChart();
+}
+
+
+// ==========================================
+// REPORTS
+// ==========================================
+
+function renderReports() {
+    const totalAssets = assets.reduce(
+        (sum, asset) => sum + getAssetValue(asset),
+        0
+    );
+
+    const totalLiabilities = 0;
+
+    const netWorth = totalAssets - totalLiabilities;
+
+    if ($("reportAssets")) {
+        $("reportAssets").textContent = money(totalAssets);
+    }
+
+    if ($("reportLiabilities")) {
+        $("reportLiabilities").textContent =
+            money(totalLiabilities);
+    }
+
+    if ($("reportNetWorth")) {
+        $("reportNetWorth").textContent = money(netWorth);
+    }
+
+    if ($("reportSummary")) {
+        $("reportSummary").textContent =
+            "This report uses your recorded assets. " +
+            "Liabilities are not included because a liabilities " +
+            "database table has not been connected yet.";
+    }
+
+    if ($("reportChart")) {
+        $("reportChart").replaceChildren();
+
+        const summary = document.createElement("p");
+        summary.textContent =
+            `Total recorded asset value: ${money(totalAssets)}`;
+
+        $("reportChart").appendChild(summary);
+    }
+}
+
+
+// ==========================================
+// SETTINGS
+// ==========================================
+
+function renderSettings() {
+    if ($("accountInformation")) {
+        $("accountInformation").textContent =
+            currentUser?.email || "Not signed in";
+    }
+}
+
+
+async function signOutUser() {
+    if (!window.supabaseClient) return;
+
+    const { error } =
+        await window.supabaseClient.auth.signOut();
+
+    if (error) {
+        message("authMessage", error.message);
+    }
+}
+
+
+$("settingsSignOut")?.addEventListener(
+    "click",
+    signOutUser
+);
+
+
+// ==========================================
+// RENDER EVERYTHING
+// ==========================================
+
+function renderEverything() {
+    renderTransactions();
+    renderBudget();
+    renderSavings();
+    renderAssets();
+    renderDashboard();
+    renderReports();
+    renderSettings();
+}
+
+
+// ==========================================
+// APP STARTUP
+// ==========================================
+
+renderEverything();
 
 showPage("dashboard");
-updateDashboard();
- 
+
+console.log("YASIR HUB Family Finance loaded successfully.");
+
+}

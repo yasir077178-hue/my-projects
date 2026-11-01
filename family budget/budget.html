@@ -4,89 +4,80 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Family Budget | Smart Finance</title>
+  <title>YASIR HUB | Family Finance</title>
   <link rel="stylesheet" href="budget.css">
   <script src="budget.js" defer></script>
 </head>
 <body>
- 
-<!-- SUPABASE AUTHENTICATION -->
+
+<!-- AUTHENTICATION -->
 <section id="authScreen" class="auth-screen">
-    <div class="auth-card">
-        <a class="auth-brand" href="#">
-            YASIR <span>HUB</span>
-        </a>
+  <div class="auth-card">
+    <a class="auth-brand" href="#">YASIR <span>HUB</span></a>
+    <div class="auth-icon">◆</div>
+    <p class="auth-eyebrow">YOUR FINANCES. YOUR FUTURE.</p>
+    <h1 id="authTitle">Welcome back</h1>
+    <p id="authSubtitle" class="auth-subtitle">
+      Sign in to access your Family Finance dashboard.
+    </p>
 
-        <div class="auth-icon">◆</div>
-        <p class="auth-eyebrow">YOUR FINANCES. YOUR FUTURE.</p>
-        <h1 id="authTitle">Welcome back</h1>
-        <p id="authSubtitle" class="auth-subtitle">
-            Sign in to access your Family Budget dashboard.
-        </p>
+    <form id="authForm">
+      <div class="auth-field">
+        <label for="authEmail">Email address</label>
+        <input id="authEmail" type="email" autocomplete="email"
+          placeholder="you@example.com" required>
+      </div>
 
-        <form id="authForm">
-            <div class="auth-field">
-                <label for="authEmail">Email address</label>
-                <input
-                    id="authEmail"
-                    type="email"
-                    autocomplete="email"
-                    placeholder="you@example.com"
-                    required
-                >
-            </div>
+      <div class="auth-field">
+        <label for="authPassword">Password</label>
+        <input id="authPassword" type="password"
+          autocomplete="current-password" minlength="6"
+          placeholder="At least 6 characters" required>
+      </div>
 
-            <div class="auth-field">
-                <label for="authPassword">Password</label>
-                <input
-                    id="authPassword"
-                    type="password"
-                    autocomplete="current-password"
-                    minlength="6"
-                    placeholder="At least 6 characters"
-                    required
-                >
-            </div>
+      <button id="authSubmit" class="auth-submit" type="submit">
+        Sign In
+      </button>
+    </form>
 
-            <button id="authSubmit" class="auth-submit" type="submit">
-                Sign In
-            </button>
-        </form>
+    <p id="authMessage" class="auth-message" aria-live="polite"></p>
 
-        <p id="authMessage" class="auth-message" aria-live="polite"></p>
+    <p class="auth-switch">
+      <span id="authSwitchText">New to YASIR HUB?</span>
+      <button id="authSwitch" type="button">Create account</button>
+    </p>
 
-        <p class="auth-switch">
-            <span id="authSwitchText">New to YASIR HUB?</span>
-            <button id="authSwitch" type="button">Create account</button>
-        </p>
-
-        <p class="auth-security">🔒 Secure sign-in powered by Supabase</p>
-    </div>
+    <p class="auth-security">🔒 Secure sign-in powered by Supabase</p>
+  </div>
 </section>
-<!-- END SUPABASE AUTHENTICATION -->
 
+<!-- MAIN APPLICATION -->
 <div class="app">
 
   <aside class="sidebar">
     <a href="#" class="brand" data-page-link="dashboard">
       <span class="brand-icon">◆</span>
-      <span>Family<span class="brand-light">Budget</span></span>
+      <span>YASIR <span class="brand-light">HUB</span></span>
     </a>
 
-    <p class="nav-heading">WORKSPACE</p>
+    <p class="nav-heading">FINANCE WORKSPACE</p>
 
-    <nav class="navigation" aria-label="Family Budget navigation">
+    <nav class="navigation" aria-label="Main navigation">
       <button class="nav-link active" data-page-link="dashboard">▦ &nbsp; Dashboard</button>
       <button class="nav-link" data-page-link="transactions">⇄ &nbsp; Transactions</button>
       <button class="nav-link" data-page-link="budgets">◎ &nbsp; Budget Planner</button>
       <button class="nav-link" data-page-link="savings">♧ &nbsp; Savings Goals</button>
+      <button class="nav-link" data-page-link="assets">◇ &nbsp; Assets</button>
+      <button class="nav-link" data-page-link="liabilities">▤ &nbsp; Liabilities</button>
+      <button class="nav-link" data-page-link="reports">▥ &nbsp; Reports</button>
+      <button class="nav-link" data-page-link="settings">⚙ &nbsp; Settings</button>
     </nav>
 
     <div class="sidebar-bottom">
       <div class="privacy-card">
         <span>🔒</span>
-        <strong>Your data stays local</strong>
-        <p>Transactions are saved in this browser or app.</p>
+        <strong>Account-secured finance</strong>
+        <p>Your financial records are separated by account.</p>
       </div>
     </div>
   </aside>
@@ -95,37 +86,37 @@
 
     <header class="topbar">
       <div>
-        <p class="eyebrow">PERSONAL FINANCE</p>
+        <p class="eyebrow">YASIR HUB · PERSONAL FINANCE</p>
         <h1 id="pageTitle">Family Dashboard</h1>
         <p class="subtitle" id="pageSubtitle">
           Plan wisely. Save consistently. Live confidently.
         </p>
       </div>
 
-      <div class="month-control">
+      <div class="month-control" id="monthControl">
         <label for="monthFilter">SELECT MONTH</label>
         <input type="month" id="monthFilter">
       </div>
+
       <button id="signOutButton" class="signout-button" type="button">
-    Sign Out
-</button>
+        Sign Out
+      </button>
     </header>
 
     <!-- DASHBOARD -->
-    <section class="page-section active"
-             id="page-dashboard" data-page="dashboard">
+    <section class="page-section active" id="page-dashboard"
+      data-page="dashboard">
 
       <section class="welcome-banner">
         <div>
           <span class="banner-label">YOUR FINANCIAL OVERVIEW</span>
           <h2>Make every rupee count.</h2>
-          <p>Keep your household finances organised in one place.</p>
+          <p>Manage your household finances in one place.</p>
         </div>
         <div class="banner-symbol">₹</div>
       </section>
 
       <section class="summary-grid">
-
         <article class="summary-card">
           <div class="card-top">
             <span class="card-label">Total Income</span>
@@ -161,7 +152,6 @@
           <h2 id="savingsRate">0%</h2>
           <p class="card-foot">Balance as a share of income</p>
         </article>
-
       </section>
 
       <section class="panel">
@@ -171,19 +161,15 @@
             <h2>Expense Breakdown</h2>
           </div>
         </div>
-
         <div id="expenseChart" class="expense-chart">
-          <p class="empty-message">
-            Add expenses to see your breakdown.
-          </p>
+          <p class="empty-message">Add expenses to see your breakdown.</p>
         </div>
       </section>
-
     </section>
 
     <!-- TRANSACTIONS -->
-    <section class="page-section"
-             id="page-transactions" data-page="transactions" hidden>
+    <section class="page-section" id="page-transactions"
+      data-page="transactions" hidden>
 
       <section class="panel">
         <div class="panel-heading">
@@ -195,7 +181,6 @@
         </div>
 
         <form id="transactionForm">
-
           <div class="form-row">
             <div class="field">
               <label for="transactionType">Transaction Type</label>
@@ -204,20 +189,18 @@
                 <option value="income">Income</option>
               </select>
             </div>
-
             <div class="field">
               <label for="transactionAmount">Amount (₹)</label>
               <input type="number" id="transactionAmount"
-                     min="0.01" max="1000000000000"
-                     step="0.01" placeholder="e.g. 1500" required>
+                min="0.01" max="1000000000000" step="0.01"
+                placeholder="e.g. 1500" required>
             </div>
           </div>
 
           <div class="field">
             <label for="transactionTitle">Description</label>
-            <input type="text" id="transactionTitle"
-                   maxlength="80"
-                   placeholder="e.g. Monthly groceries" required>
+            <input type="text" id="transactionTitle" maxlength="80"
+              placeholder="e.g. Monthly groceries" required>
           </div>
 
           <div class="form-row">
@@ -237,7 +220,6 @@
                 <option value="Other">Other</option>
               </select>
             </div>
-
             <div class="field">
               <label for="transactionDate">Date</label>
               <input type="date" id="transactionDate" required>
@@ -248,7 +230,6 @@
             + Add Transaction
           </button>
         </form>
-
         <p id="formMessage" class="form-message" aria-live="polite"></p>
       </section>
 
@@ -278,15 +259,14 @@
         </div>
 
         <p id="emptyTransactions" class="empty-message">
-          No transactions for this month. Add one using the form above.
+          No transactions for this month.
         </p>
       </section>
-
     </section>
 
     <!-- BUDGET PLANNER -->
-    <section class="page-section"
-             id="page-budgets" data-page="budgets" hidden>
+    <section class="page-section" id="page-budgets"
+      data-page="budgets" hidden>
 
       <section class="panel narrow-panel">
         <div class="panel-heading">
@@ -298,17 +278,16 @@
         </div>
 
         <p class="section-description">
-          Set a spending limit for the selected month and track how much you have used.
+          Set a spending limit and track your monthly expenses.
         </p>
 
         <form id="budgetForm">
           <div class="field">
             <label for="budgetLimit">Monthly Expense Limit (₹)</label>
-            <input type="number" id="budgetLimit"
-                   min="0" max="1000000000000" step="0.01"
-                   placeholder="e.g. 30000" required>
+            <input type="number" id="budgetLimit" min="0"
+              max="1000000000000" step="0.01"
+              placeholder="e.g. 30000" required>
           </div>
-
           <button type="submit" class="secondary-button full-button">
             Save Budget
           </button>
@@ -319,27 +298,23 @@
             <span>Spent</span>
             <strong id="budgetSpent">₹0</strong>
           </div>
-
           <div class="progress-track">
             <div class="progress-fill" id="budgetProgress"></div>
           </div>
-
           <div class="budget-numbers">
             <span id="budgetRemainingLabel">Budget remaining</span>
             <strong id="budgetRemaining">₹0</strong>
           </div>
-
           <p id="budgetMessage" class="budget-message">
-            Set a monthly spending limit to track your budget.
+            Set a monthly spending limit.
           </p>
         </div>
       </section>
-
     </section>
 
     <!-- SAVINGS GOALS -->
-    <section class="page-section"
-             id="page-savings" data-page="savings" hidden>
+    <section class="page-section" id="page-savings"
+      data-page="savings" hidden>
 
       <section class="panel narrow-panel">
         <div class="panel-heading">
@@ -351,17 +326,16 @@
         </div>
 
         <p class="section-description">
-          Set a savings target and follow your progress using your selected month's balance.
+          Set a savings target and follow your progress.
         </p>
 
         <form id="savingsForm">
           <div class="field">
             <label for="savingsTarget">Savings Target (₹)</label>
-            <input type="number" id="savingsTarget"
-                   min="0" max="1000000000000" step="0.01"
-                   placeholder="e.g. 10000" required>
+            <input type="number" id="savingsTarget" min="0"
+              max="1000000000000" step="0.01"
+              placeholder="e.g. 10000" required>
           </div>
-
           <button type="submit" class="secondary-button full-button">
             Save Target
           </button>
@@ -371,7 +345,6 @@
           <div class="savings-circle" id="savingsCircle">
             <span id="savingsProgress">0%</span>
           </div>
-
           <div>
             <p class="muted">Current monthly balance</p>
             <h3 id="savingsCurrent">₹0</h3>
@@ -380,21 +353,366 @@
             </p>
           </div>
         </div>
-
         <p id="savingsMessage" class="budget-message">
           Set a savings target to begin.
         </p>
       </section>
+    </section>
 
+    <!-- ASSETS -->
+    <section class="page-section" id="page-assets"
+      data-page="assets" hidden>
+
+      <section class="welcome-banner">
+        <div>
+          <span class="banner-label">YOUR WEALTH</span>
+          <h2>Asset Overview</h2>
+          <p>Track the value of your properties, savings and investments.</p>
+        </div>
+        <div class="banner-symbol">◇</div>
+      </section>
+
+      <section class="summary-grid">
+        <article class="summary-card">
+          <span class="card-label">Total Asset Value</span>
+          <h2 id="totalAssetValue">₹0</h2>
+          <p class="card-foot">Based on recorded valuations</p>
+        </article>
+        <article class="summary-card">
+          <span class="card-label">Purchase Value</span>
+          <h2 id="totalAssetPurchase">₹0</h2>
+          <p class="card-foot">Recorded purchase amounts</p>
+        </article>
+        <article class="summary-card">
+          <span class="card-label">Profit / Loss</span>
+          <h2 id="assetProfitLoss">₹0</h2>
+          <p class="card-foot">Current value minus purchase value</p>
+        </article>
+      </section>
+
+      <section class="panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">ASSET MANAGEMENT</p>
+            <h2>Add an Asset</h2>
+          </div>
+          <button type="button" class="secondary-button"
+            id="assetHistoryButton">View History</button>
+        </div>
+
+        <form id="assetForm">
+          <div class="form-row">
+            <div class="field">
+              <label for="assetName">Asset Name</label>
+              <input id="assetName" type="text" maxlength="100"
+                placeholder="e.g. Gold jewellery" required>
+            </div>
+            <div class="field">
+              <label for="assetType">Asset Category</label>
+              <select id="assetType" required>
+                <option value="gold">Gold</option>
+                <option value="silver">Silver</option>
+                <option value="stocks">Stocks</option>
+                <option value="mutual_funds">Mutual Funds</option>
+                <option value="etfs">ETFs</option>
+                <option value="crypto">Cryptocurrency</option>
+                <option value="land">Land</option>
+                <option value="property">House / Building</option>
+                <option value="bank">Bank Savings</option>
+                <option value="fixed_deposit">Fixed Deposit</option>
+                <option value="vehicle">Vehicle</option>
+                <option value="valuables">Other Valuables</option>
+                <option value="business">Business Ownership</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="field">
+              <label for="assetQuantity">Quantity</label>
+              <input id="assetQuantity" type="number" min="0.000001"
+                step="any" placeholder="e.g. 10" required>
+            </div>
+            <div class="field">
+              <label for="assetUnit">Unit</label>
+              <input id="assetUnit" type="text" maxlength="30"
+                placeholder="e.g. grams, units, acres" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="field">
+              <label for="assetPurchasePrice">Purchase Price (₹)</label>
+              <input id="assetPurchasePrice" type="number" min="0"
+                step="0.01" required>
+            </div>
+            <div class="field">
+              <label for="assetCurrentValue">Current Total Value (₹)</label>
+              <input id="assetCurrentValue" type="number" min="0"
+                step="0.01" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="field">
+              <label for="assetCurrency">Currency</label>
+              <select id="assetCurrency">
+                <option value="INR">INR (₹)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="assetValuationMode">Valuation Method</label>
+              <select id="assetValuationMode" required>
+                <option value="manual">Manual</option>
+                <option value="market">Market price</option>
+              </select>
+            </div>
+          </div>
+
+          <button type="submit" class="primary-button full-button">
+            + Save Asset
+          </button>
+        </form>
+        <p id="assetFormMessage" class="form-message"
+          aria-live="polite"></p>
+      </section>
+
+      <section class="panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">YOUR PORTFOLIO</p>
+            <h2>My Assets</h2>
+          </div>
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Asset</th>
+                <th>Category</th>
+                <th>Quantity</th>
+                <th>Purchase Value</th>
+                <th>Current Value</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="assetList"></tbody>
+          </table>
+        </div>
+        <p id="emptyAssets" class="empty-message">
+          No assets added yet.
+        </p>
+      </section>
+
+      <section class="panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">VALUATION TREND</p>
+            <h2>Asset Value History</h2>
+          </div>
+        </div>
+        <div id="assetChart" class="expense-chart">
+          <p class="empty-message">Valuation history will appear here.</p>
+        </div>
+      </section>
+
+      <section class="panel" id="assetHistoryPanel" hidden>
+        <div class="panel-heading">
+          <h2>Asset Change History</h2>
+          <button id="closeAssetHistory" type="button"
+            class="secondary-button">Close</button>
+        </div>
+        <div id="assetHistoryList"></div>
+      </section>
+    </section>
+
+    <!-- LIABILITIES -->
+    <section class="page-section" id="page-liabilities"
+      data-page="liabilities" hidden>
+
+      <section class="welcome-banner">
+        <div>
+          <span class="banner-label">YOUR FINANCIAL OBLIGATIONS</span>
+          <h2>Liability Overview</h2>
+          <p>Keep track of loans and outstanding balances.</p>
+        </div>
+        <div class="banner-symbol">−</div>
+      </section>
+
+      <section class="summary-grid">
+        <article class="summary-card">
+          <span class="card-label">Total Liabilities</span>
+          <h2 id="totalLiabilities">₹0</h2>
+          <p class="card-foot">Recorded outstanding balances</p>
+        </article>
+      </section>
+
+      <section class="panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">DEBT MANAGEMENT</p>
+            <h2>Add Liability</h2>
+          </div>
+        </div>
+
+        <form id="liabilityForm">
+          <div class="form-row">
+            <div class="field">
+              <label for="liabilityName">Liability Name</label>
+              <input id="liabilityName" type="text" maxlength="100"
+                placeholder="e.g. Vehicle loan" required>
+            </div>
+            <div class="field">
+              <label for="liabilityType">Type</label>
+              <select id="liabilityType" required>
+                <option value="home_loan">Home Loan</option>
+                <option value="vehicle_loan">Vehicle Loan</option>
+                <option value="personal_loan">Personal Loan</option>
+                <option value="education_loan">Education Loan</option>
+                <option value="other">Other Debt</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="field">
+              <label for="liabilityOriginal">Original Amount (₹)</label>
+              <input id="liabilityOriginal" type="number" min="0.01"
+                step="0.01" required>
+            </div>
+            <div class="field">
+              <label for="liabilityOutstanding">Outstanding Amount (₹)</label>
+              <input id="liabilityOutstanding" type="number" min="0"
+                step="0.01" required>
+            </div>
+          </div>
+
+          <button type="submit" class="primary-button full-button">
+            + Save Liability
+          </button>
+        </form>
+        <p id="liabilityMessage" class="form-message"
+          aria-live="polite"></p>
+      </section>
+
+      <section class="panel">
+        <div class="panel-heading">
+          <h2>My Liabilities</h2>
+        </div>
+        <div id="liabilityList"></div>
+        <p id="emptyLiabilities" class="empty-message">
+          No liabilities recorded.
+        </p>
+      </section>
+    </section>
+
+    <!-- REPORTS -->
+    <section class="page-section" id="page-reports"
+      data-page="reports" hidden>
+
+      <section class="welcome-banner">
+        <div>
+          <span class="banner-label">FINANCIAL INSIGHTS</span>
+          <h2>Your Financial Reports</h2>
+          <p>Understand your overall financial position.</p>
+        </div>
+        <div class="banner-symbol">▥</div>
+      </section>
+
+      <section class="summary-grid">
+        <article class="summary-card">
+          <span class="card-label">Total Assets</span>
+          <h2 id="reportAssets">₹0</h2>
+        </article>
+        <article class="summary-card">
+          <span class="card-label">Total Liabilities</span>
+          <h2 id="reportLiabilities">₹0</h2>
+        </article>
+        <article class="summary-card">
+          <span class="card-label">Net Worth</span>
+          <h2 id="reportNetWorth">₹0</h2>
+          <p class="card-foot">Assets minus liabilities</p>
+        </article>
+      </section>
+
+      <section class="panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">MONTHLY ANALYSIS</p>
+            <h2>Income &amp; Expenses</h2>
+          </div>
+        </div>
+        <div id="reportChart" class="expense-chart">
+          <p class="empty-message">Reports will appear when data is available.</p>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-heading">
+          <h2>Financial Summary</h2>
+        </div>
+        <div id="reportSummary"></div>
+      </section>
+    </section>
+
+    <!-- SETTINGS -->
+    <section class="page-section" id="page-settings"
+      data-page="settings" hidden>
+
+      <section class="welcome-banner">
+        <div>
+          <span class="banner-label">ACCOUNT PREFERENCES</span>
+          <h2>Settings</h2>
+          <p>Manage your account and application preferences.</p>
+        </div>
+        <div class="banner-symbol">⚙</div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-heading">
+          <h2>Account Information</h2>
+        </div>
+        <p class="section-description">
+          Your account is protected by Supabase authentication.
+        </p>
+        <div id="accountInformation">Loading account information...</div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-heading">
+          <h2>Preferences</h2>
+        </div>
+        <div class="field">
+          <label for="currencySetting">Display Currency</label>
+          <select id="currencySetting">
+            <option value="INR">Indian Rupee (₹)</option>
+          </select>
+        </div>
+        <p class="section-description">
+          Currency changes the display preference. It does not convert
+          previously recorded amounts automatically.
+        </p>
+      </section>
+
+      <section class="panel">
+        <div class="panel-heading">
+          <h2>Security</h2>
+        </div>
+        <p>Manage your account through the registered email address.</p>
+        <button id="settingsSignOut" type="button"
+          class="secondary-button">Sign Out</button>
+      </section>
     </section>
 
     <footer class="footer">
-      <p>FAMILY BUDGET · A Household Finance Management Project</p>
-      <p>Made for learning and financial awareness.</p>
+      <p>YASIR HUB · FAMILY FINANCE MANAGEMENT</p>
+      <p>Plan wisely. Build financial awareness.</p>
     </footer>
 
   </main>
 </div>
+
 <script type="module" src="supabase-client.js"></script>
 </body>
 </html>

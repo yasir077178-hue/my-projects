@@ -1,205 +1,261 @@
 
+/* =========================================================
+   YASIR HUB — SUPABASE BACKEND
+   Authentication + User Session
+========================================================= */
+
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
-// Keep the same project URL and publishable key
-// that you already used successfully.
-const SUPABASE_URL = "https://pvjdpppefcwpgwzkbucg.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_MOR8kv7_mU-Slht7uHfV5g_JDGQuS8E";
+/* =========================================================
+   SUPABASE CONNECTION
+========================================================= */
 
-const supabase = createClient(
+const SUPABASE_URL =
+    "https://pvjdpppefcwpgwzkbucg.supabase.co";
+
+const SUPABASE_PUBLISHABLE_KEY =
+    "sb_publishable_MOR8kv7_mU-Slht7uHfV5g_JDGQuS8E";
+
+export const supabase = createClient(
     SUPABASE_URL,
     SUPABASE_PUBLISHABLE_KEY
 );
 
+// Make the client available to budget.js.
 window.supabaseClient = supabase;
 
-const authScreen = document.getElementById("authScreen");
-const authForm = document.getElementById("authForm");
-const authEmail = document.getElementById("authEmail");
-const authPassword = document.getElementById("authPassword");
-const authTitle = document.getElementById("authTitle");
-const authSubtitle = document.getElementById("authSubtitle");
-const authSubmit = document.getElementById("authSubmit");
-const authMessage = document.getElementById("authMessage");
-const authSwitch = document.getElementById("authSwitch");
-const authSwitchText = document.getElementById("authSwitchText");
-const signOutButton = document.getElementById("signOutButton");
+
+/* =========================================================
+   HTML ELEMENTS
+========================================================= */
+
+const $ = (id) => document.getElementById(id);
+
+const authScreen = $("authScreen");
+const authForm = $("authForm");
+const authTitle = $("authTitle");
+const authSubtitle = $("authSubtitle");
+const authEmail = $("authEmail");
+const authPassword = $("authPassword");
+const authSubmit = $("authSubmit");
+const authMessage = $("authMessage");
+const authSwitch = $("authSwitch");
+const authSwitchText = $("authSwitchText");
+
+const signOutButton = $("signOutButton");
 
 let authMode = "login";
-let authBusy = false;
 
-function showAuthMessage(message, isError = false) {
-    authMessage.textContent = message;
-    authMessage.classList.toggle("error", isError);
+
+/* =========================================================
+   AUTH SCREEN DISPLAY
+========================================================= */
+
+function showMessage(text, error = false) {
+    if (!authMessage) return;
+
+    authMessage.textContent = text;
+    authMessage.classList.toggle("error", error);
 }
 
-function setAuthMode(mode) {
-    authMode = mode;
+function showLoginScreen() {
+    if (authScreen) authScreen.hidden = false;
 
-    const signingUp = mode === "signup";
-
-    authTitle.textContent = signingUp
-        ? "Create your account"
-        : "Welcome back";
-
-    authSubtitle.textContent = signingUp
-        ? "Create an account to manage your family finances."
-        : "Sign in to access your Family Budget dashboard.";
-
-    authSubmit.textContent = signingUp
-        ? "Create Account"
-        : "Sign In";
-
-    authPassword.autocomplete = signingUp
-        ? "new-password"
-        : "current-password";
-
-    authSwitchText.textContent = signingUp
-        ? "Already have an account?"
-        : "New to YASIR HUB?";
-
-    authSwitch.textContent = signingUp
-        ? "Sign in"
-        : "Create account";
-
-    showAuthMessage("");
+    document.querySelectorAll(".app").forEach(element => {
+        element.hidden = true;
+    });
 }
 
-function showSignedInState(user) {
-    authScreen.hidden = true;
-    document.querySelector(".app").hidden = false;
+function showAppScreen() {
+    if (authScreen) authScreen.hidden = true;
 
-    if (signOutButton) {
-        signOutButton.hidden = false;
+    document.querySelectorAll(".app").forEach(element => {
+        element.hidden = false;
+    });
+}
+
+
+/* =========================================================
+   LOGIN / SIGNUP MODE
+========================================================= */
+
+function updateAuthMode() {
+    if (authTitle) {
+        authTitle.textContent =
+            authMode === "login" ? "Welcome Back" : "Create Your Account";
     }
 
-    console.log("Signed in:", user.email);
-}
-
-function showSignedOutState() {
-    authScreen.hidden = false;
-    document.querySelector(".app").hidden = true;
-
-    if (signOutButton) {
-        signOutButton.hidden = true;
+    if (authSubtitle) {
+        authSubtitle.textContent =
+            authMode === "login"
+                ? "Login to access your family finance dashboard."
+                : "Create your personal YASIR HUB account.";
     }
 
-    authPassword.value = "";
-    setAuthMode("login");
-}
-
-authSwitch.addEventListener("click", () => {
-    setAuthMode(authMode === "login" ? "signup" : "login");
-});
-
-authForm.addEventListener("submit", async (event) => {
-    event.preventDefault();
-
-    if (authBusy) return;
-
-    const email = authEmail.value.trim();
-    const password = authPassword.value;
-
-    if (!email || !password) {
-        showAuthMessage("Enter your email and password.", true);
-        return;
+    if (authSubmit) {
+        authSubmit.textContent =
+            authMode === "login" ? "Login" : "Create Account";
     }
 
-    authBusy = true;
-    authSubmit.disabled = true;
-    authSubmit.textContent = authMode === "signup"
-        ? "Creating account..."
-        : "Signing in...";
+    if (authSwitchText) {
+        authSwitchText.textContent =
+            authMode === "login"
+                ? "Don't have an account?"
+                : "Already have an account?";
+    }
 
-    showAuthMessage("");
+    if (authSwitch) {
+        authSwitch.textContent =
+            authMode === "login" ? "Sign Up" : "Login";
+    }
 
-    try {
-        if (authMode === "signup") {
-            const { data, error } = await supabase.auth.signUp({
-                email,
-                password
-            });
+    showMessage("");
+}
 
-            if (error) throw error;
+if (authSwitch) {
+    authSwitch.addEventListener("click", () => {
+        authMode = authMode === "login" ? "signup" : "login";
 
-            if (data.session) {
-                showSignedInState(data.user);
-            } else {
-                showAuthMessage(
-                    "Account created! Check your email to confirm your account, then sign in."
-                );
-                setAuthMode("login");
-            }
-        } else {
-            const { data, error } =
-                await supabase.auth.signInWithPassword({
+        if (authForm) authForm.reset();
+
+        updateAuthMode();
+    });
+}
+
+
+/* =========================================================
+   AUTH FORM SUBMISSION
+========================================================= */
+
+if (authForm) {
+    authForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const email = authEmail?.value.trim();
+        const password = authPassword?.value;
+
+        if (!email || !password) {
+            showMessage("Please enter your email and password.", true);
+            return;
+        }
+
+        if (password.length < 6) {
+            showMessage("Password must contain at least 6 characters.", true);
+            return;
+        }
+
+        if (authSubmit) {
+            authSubmit.disabled = true;
+            authSubmit.textContent = "Please wait...";
+        }
+
+        showMessage("");
+
+        try {
+            if (authMode === "signup") {
+
+                const { data, error } = await supabase.auth.signUp({
                     email,
                     password
                 });
 
-            if (error) throw error;
+                if (error) throw error;
 
-            showSignedInState(data.user);
+                if (data.session) {
+                    showMessage("Account created successfully!");
+                } else {
+                    showMessage(
+                        "Account created! Check your email and confirm your account before logging in."
+                    );
+                }
+
+            } else {
+
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email,
+                    password
+                });
+
+                if (error) throw error;
+
+                if (data.session) {
+                    showMessage("Login successful!");
+                }
+            }
+
+        } catch (error) {
+            showMessage(error.message || "Authentication failed.", true);
+
+        } finally {
+            if (authSubmit) {
+                authSubmit.disabled = false;
+                authSubmit.textContent =
+                    authMode === "login" ? "Login" : "Create Account";
+            }
         }
-    } catch (error) {
-        showAuthMessage(error.message || "Authentication failed.", true);
-    } finally {
-        authBusy = false;
-        authSubmit.disabled = false;
-        authSubmit.textContent = authMode === "signup"
-            ? "Create Account"
-            : "Sign In";
-    }
-});
-
-if (signOutButton) {
-    signOutButton.addEventListener("click", async () => {
-        signOutButton.disabled = true;
-
-        const { error } = await supabase.auth.signOut();
-
-        signOutButton.disabled = false;
-
-        if (error) {
-            alert("Could not sign out: " + error.message);
-            return;
-        }
-
-        showSignedOutState();
     });
 }
 
-// Restore the existing Supabase session after a page refresh.
-async function initialiseAuth() {
-    authScreen.hidden = false;
-    document.querySelector(".app").hidden = true;
 
-    try {
-        const { data, error } = await supabase.auth.getSession();
+/* =========================================================
+   SIGN OUT
+========================================================= */
 
-        if (error) throw error;
+async function signOut() {
+    if (!confirm("Are you sure you want to sign out?")) return;
 
-        if (data.session) {
-            showSignedInState(data.session.user);
-        } else {
-            showSignedOutState();
-        }
-    } catch (error) {
-        showAuthMessage(
-            "Could not connect to Supabase. Check your project URL and publishable key.",
-            true
-        );
-        console.error("Supabase authentication error:", error);
+    const { error } = await supabase.auth.signOut();
+
+    if (error) {
+        alert("Sign out failed: " + error.message);
     }
 }
 
+if (signOutButton) {
+    signOutButton.addEventListener("click", signOut);
+}
+
+
+/* =========================================================
+   AUTH STATE LISTENER
+========================================================= */
+
 supabase.auth.onAuthStateChange((event, session) => {
-    if (event === "SIGNED_OUT" || !session) {
-        showSignedOutState();
-    } else if (event === "SIGNED_IN" || event === "INITIAL_SESSION") {
-        showSignedInState(session.user);
+
+    if (session?.user) {
+        showAppScreen();
+
+        console.log("YASIR HUB user signed in:", session.user.email);
+
+    } else {
+        showLoginScreen();
+
+        console.log("YASIR HUB user signed out.");
     }
 });
 
-setAuthMode("login");
-initialiseAuth();
+
+/* =========================================================
+   INITIAL SESSION CHECK
+========================================================= */
+
+async function checkSession() {
+    const { data, error } = await supabase.auth.getSession();
+
+    if (error) {
+        console.error("Session error:", error.message);
+        showLoginScreen();
+        return;
+    }
+
+    if (data.session?.user) {
+        showAppScreen();
+    } else {
+        showLoginScreen();
+    }
+}
+
+updateAuthMode();
+checkSession();
+
+console.log("YASIR HUB Supabase backend connected.");
