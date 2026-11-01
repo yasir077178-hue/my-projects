@@ -10,46 +10,238 @@
 </head>
 <body>
 
+
 <!-- AUTHENTICATION -->
 <section id="authScreen" class="auth-screen">
   <div class="auth-card">
-    <a class="auth-brand" href="#">YASIR <span>HUB</span></a>
+
+    <a class="auth-brand" href="#">
+      YASIR <span>HUB</span>
+    </a>
+
     <div class="auth-icon">◆</div>
     <p class="auth-eyebrow">YOUR FINANCES. YOUR FUTURE.</p>
-    <h1 id="authTitle">Welcome back</h1>
-    <p id="authSubtitle" class="auth-subtitle">
-      Sign in to access your Family Finance dashboard.
-    </p>
 
-    <form id="authForm">
-      <div class="auth-field">
-        <label for="authEmail">Email address</label>
-        <input id="authEmail" type="email" autocomplete="email"
-          placeholder="you@example.com" required>
-      </div>
+    <!-- SIGN IN -->
+    <div id="signInStep">
+      <h1>Welcome back</h1>
+      <p class="auth-subtitle">
+        Sign in to access your Family Finance dashboard.
+      </p>
 
-      <div class="auth-field">
-        <label for="authPassword">Password</label>
-        <input id="authPassword" type="password"
-          autocomplete="current-password" minlength="6"
-          placeholder="At least 6 characters" required>
-      </div>
+      <form id="signInForm">
+        <div class="auth-field">
+          <label for="authEmail">Email address</label>
+          <input
+            id="authEmail"
+            type="email"
+            autocomplete="email"
+            placeholder="you@example.com"
+            required
+          >
+        </div>
 
-      <button id="authSubmit" class="auth-submit" type="submit">
-        Sign In
+        <div class="auth-field">
+          <label for="authPassword">Password</label>
+          <input
+            id="authPassword"
+            type="password"
+            autocomplete="current-password"
+            placeholder="Enter your password"
+            required
+          >
+        </div>
+
+        <button id="signInSubmit" class="auth-submit" type="submit">
+          Sign In
+        </button>
+      </form>
+
+      <p class="auth-links">
+        <a href="#" id="forgotPasswordLink">Forgot Password?</a>
+      </p>
+
+      <p class="auth-switch">
+        Don't have an account?
+        <a href="#" id="createAccountLink">Create Account</a>
+      </p>
+    </div>
+
+    <!-- CREATE ACCOUNT -->
+    <div id="signUpStep" hidden>
+      <h1>Create your account</h1>
+      <p class="auth-subtitle">
+        Register with your email and create a secure password.
+      </p>
+
+      <form id="signUpForm">
+        <div class="auth-field">
+          <label for="signUpEmail">Email address</label>
+          <input
+            id="signUpEmail"
+            type="email"
+            autocomplete="email"
+            placeholder="you@example.com"
+            required
+          >
+        </div>
+
+        <div class="auth-field">
+          <label for="signUpPassword">Create Password</label>
+          <input
+            id="signUpPassword"
+            type="password"
+            autocomplete="new-password"
+            minlength="8"
+            placeholder="At least 8 characters"
+            required
+          >
+        </div>
+
+        <div class="auth-field">
+          <label for="confirmPassword">Confirm Password</label>
+          <input
+            id="confirmPassword"
+            type="password"
+            autocomplete="new-password"
+            minlength="8"
+            placeholder="Enter password again"
+            required
+          >
+        </div>
+
+        <button id="signUpSubmit" class="auth-submit" type="submit">
+          Create Account
+        </button>
+      </form>
+
+      <p class="auth-switch">
+        Already have an account?
+        <a href="#" id="backToSignIn">Sign In</a>
+      </p>
+    </div>
+
+    <!-- FORGOT PASSWORD -->
+    <div id="forgotPasswordStep" hidden>
+      <h1>Reset Password</h1>
+      <p class="auth-subtitle">
+        Enter your registered email to receive a password reset link.
+      </p>
+
+      <form id="forgotPasswordForm">
+        <div class="auth-field">
+          <label for="resetEmail">Email address</label>
+          <input
+            id="resetEmail"
+            type="email"
+            autocomplete="email"
+            placeholder="you@example.com"
+            required
+          >
+        </div>
+
+        <button id="resetPasswordSubmit" class="auth-submit" type="submit">
+          Send Reset Link
+        </button>
+      </form>
+
+      <p class="auth-switch">
+        Remember your password?
+        <a href="#" id="backFromForgotPassword">Sign In</a>
+      </p>
+    </div>
+
+    <!-- EMAIL VERIFICATION -->
+    <div id="verificationStep" hidden>
+      <h1>Verify your email</h1>
+      <p class="auth-subtitle">
+        Verification link anuppiyirukkom. Gmail open panni link click pannunga.
+      </p>
+
+      <button id="resendEmail" class="auth-submit" type="button">
+        Resend Email
       </button>
-    </form>
+    </div>
+
+    <!-- FIRST-TIME PIN SETUP -->
+    <div id="setupPinStep" hidden>
+      <h1>Create your PIN</h1>
+      <p class="auth-subtitle">
+        Dashboard unlock panna 4-digit PIN create pannunga.
+      </p>
+
+      <form id="setupPinForm">
+        <div class="auth-field">
+          <label for="newPin">4-digit PIN</label>
+          <input
+            id="newPin"
+            type="password"
+            inputmode="numeric"
+            autocomplete="new-password"
+            maxlength="4"
+            pattern="[0-9]{4}"
+            placeholder="••••"
+            required
+          >
+        </div>
+
+        <div class="auth-field">
+          <label for="confirmPin">Confirm PIN</label>
+          <input
+            id="confirmPin"
+            type="password"
+            inputmode="numeric"
+            autocomplete="new-password"
+            maxlength="4"
+            pattern="[0-9]{4}"
+            placeholder="••••"
+            required
+          >
+        </div>
+
+        <button id="setupPinSubmit" class="auth-submit" type="submit">
+          Save PIN
+        </button>
+      </form>
+    </div>
+
+    <!-- RETURNING USER PIN UNLOCK -->
+    <div id="unlockPinStep" hidden>
+      <h1>Welcome back</h1>
+      <p class="auth-subtitle">
+        Enter your 4-digit PIN to unlock Family Finance.
+      </p>
+
+      <form id="unlockPinForm">
+        <div class="auth-field">
+          <label for="loginPin">Your PIN</label>
+          <input
+            id="loginPin"
+            type="password"
+            inputmode="numeric"
+            autocomplete="current-password"
+            maxlength="4"
+            pattern="[0-9]{4}"
+            placeholder="••••"
+            required
+          >
+        </div>
+
+        <button id="unlockPinSubmit" class="auth-submit" type="submit">
+          Unlock Dashboard
+        </button>
+      </form>
+    </div>
 
     <p id="authMessage" class="auth-message" aria-live="polite"></p>
 
-    <p class="auth-switch">
-      <span id="authSwitchText">New to YASIR HUB?</span>
-      <button id="authSwitch" type="button">Create account</button>
+    <p class="auth-security">
+      🔒 Secure authentication powered by Supabase
     </p>
 
-    <p class="auth-security">🔒 Secure sign-in powered by Supabase</p>
   </div>
 </section>
+<!-- END AUTHENTICATION -->
 
 <!-- MAIN APPLICATION -->
 <div class="app">
